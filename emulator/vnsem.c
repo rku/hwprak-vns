@@ -28,14 +28,14 @@ void print_machine_state(vnsem_machine *machine)
 {
     printf("#%.3i  ", machine->step_count);
     printf("R:[PC=0x%.2x L=0x%.2x SP=0x%.2x]  ",
-            machine->program_counter,
-            machine->l_register,
-            machine->stack_pointer);
-    printf("A:[V=0x%.2x C=%.1i Z=%.1i S=%.1i]\n",
-            machine->accumulator,
-            (machine->flags & FLAG_CARRY) ? 1 : 0,
-            (machine->flags & FLAG_ZERO) ? 1 : 0,
-            (machine->flags & FLAG_SIGN) ? 1 : 0);
+            machine->pc,
+            machine->reg_l,
+            machine->sp);
+    printf("A:[V=0x%.2x C=%c Z=%c S=%c]\n",
+            machine->accu,
+            (machine->flags & FLAG_CARRY) ? '*' : '.',
+            (machine->flags & FLAG_ZERO)  ? '*' : '.',
+            (machine->flags & FLAG_SIGN)  ? '*' : '.');
 }
 
 void print_key(void)
@@ -65,7 +65,7 @@ void reset_machine(vnsem_machine *machine)
 {
     /* set everything to zero */
     memset(machine, 0, sizeof(*machine));
-    machine->stack_pointer = 255;
+    machine->sp = 255;
 }
 
 void load_program(vnsem_machine *machine)
@@ -105,214 +105,106 @@ void unset_flag(uint8_t flag, vnsem_machine *machine)
 
 uint8_t read_argument(vnsem_machine *machine)
 {
-    return machine->memory[machine->program_counter++];
+    return machine->memory[machine->pc++];
+}
+
+void call(uint8_t addr, vnsem_machine *machine)
+{
+    --machine->sp;
+    machine->memory[machine->sp] = machine->pc;
+    machine->sp = addr;
+}
+
+void compare(uint8_t a, uint8_t b, vnsem_machine *machine)
+{
+    if(a == b) {
+        set_flag(FLAG_ZERO, machine);
+    } else {
+        unset_flag(FLAG_ZERO, machine);
+    }
 }
 
 void process_instruction(uint8_t ins, vnsem_machine *m)
 {
     switch(ins) {
         /* ----- TRANSFER ----- */
-        case 0x7d: /* MOV A,L */
-            m->accumulator = m->l_register;
-            break;
-        case 0x7e: /* MOV A,M */
-            m->accumulator = m->memory[m->l_register];
-            break;
-        case 0x77: /* MOV M,A */
-            m->memory[m->l_register] = m->accumulator;
-            break;
-        case 0x3e: /* MVI A,n */
-            m->accumulator = read_argument(m);
-            break;
-        case 0x3a: /* LDA adr */
-            m->accumulator = m->memory[read_argument(m)];
-            break;
-        case 0x32: /* STA adr */
-            m->memory[read_argument(m)] = m->accumulator;
-            break;
-        case 0x6f: /* MOV L,A */
-            m->l_register = m->accumulator;
-            break;
-        case 0x6e: /* MOV L,M */
-            m->l_register = m->memory[m->l_register];
-            break;
-        case 0x2e: /* MVI L,n */
-            m->l_register = read_argument(m);
-            break;
-        case 0x31: /* LXI SP,n */
-            m->stack_pointer = read_argument(m);
-            break;
-        case 0xf5: /* PUSH A */
-            --m->stack_pointer;
-            m->memory[m->stack_pointer] = m->accumulator;
-            break;
-        case 0xe5: /* PUSH L */
-            --m->stack_pointer;
-            m->memory[m->stack_pointer] = m->l_register;
-            break;
-        case 0xed: /* PUSH FL */
-            --m->stack_pointer;
-            m->memory[m->stack_pointer] = m->flags;
-            break;
-        case 0xf1: /* POP A */
-            m->accumulator = m->memory[m->stack_pointer];
-            ++m->stack_pointer;
-            break;
-        case 0xe1: /* POP L */
-            m->l_register = m->memory[m->stack_pointer];
-            ++m->stack_pointer;
-            break;
-        case 0xfd: /* POP FL */
-            m->flags = m->memory[m->stack_pointer];
-            ++m->stack_pointer;
-            break;
-        case 0xdb: /* IN adr */
-            break;
-        case 0xd3: /* OUT adr */
-            break;
+        case 0x7d: /* MOV A,L */ m->accu = m->reg_l; break;
+        case 0x7e: /* MOV A,M */ m->accu = m->memory[m->reg_l]; break;
+        case 0x77: /* MOV M,A */ m->memory[m->reg_l] = m->accu; break;
+        case 0x3e: /* MVI A,n */ m->accu = read_argument(m); break;
+        case 0x3a: /* LDA adr */ m->accu = m->memory[read_argument(m)]; break;
+        case 0x32: /* STA adr */ m->memory[read_argument(m)] = m->accu; break;
+        case 0x6f: /* MOV L,A */ m->reg_l = m->accu; break;
+        case 0x6e: /* MOV L,M */ m->reg_l = m->memory[m->reg_l]; break;
+        case 0x2e: /* MVI L,n */ m->reg_l = read_argument(m); break;
+        case 0x31: /* LXI SP,n */ m->sp = read_argument(m); break;
+        case 0xf5: /* PUSH A  */ --m->sp; m->memory[m->sp] = m->accu; break;
+        case 0xe5: /* PUSH L  */ --m->sp; m->memory[m->sp] = m->reg_l; break;
+        case 0xed: /* PUSH FL */ --m->sp; m->memory[m->sp] = m->flags; break;
+        case 0xf1: /* POP A   */ m->accu = m->memory[m->sp]; ++m->sp; break;
+        case 0xe1: /* POP L   */ m->reg_l = m->memory[m->sp]; ++m->sp; break;
+        case 0xfd: /* POP FL  */ m->flags = m->memory[m->sp]; ++m->sp; break;
+        case 0xdb: /* IN adr  */ break;
+        case 0xd3: /* OUT adr */ break;
         /* ------ ARITHMETIC  ------ */
-        case 0x3c: /* INR A */
-            ++m->accumulator;
-            break;
-        case 0x2c: /* INR L */
-            ++m->l_register;
-            break;
-        case 0x3d: /* DCR A */
-            --m->accumulator;
-            break;
-        case 0x2d: /* DCR L */
-            --m->l_register;
-            break;
-        case 0x87: /* ADD A */
-            m->accumulator *= 2;
-            break;
-        case 0x85: /* ADD L */
-            m->accumulator += m->l_register;
-            break;
-        case 0x86: /* ADD M */
-            m->accumulator += m->memory[m->l_register];
-            break;
-        case 0xc6: /* ADI n */
-            m->accumulator += read_argument(m);
-            break;
-        case 0x97: /* SUB A */
-            m->accumulator = 0;
-            break;
-        case 0x95: /* SUB L */
-            m->l_register = 0;
-            break;
-        case 0x96: /* SUB M */
-            m->accumulator -= m->memory[m->l_register];
-            break;
-        case 0xd6: /* SUI n */
-            m->accumulator -= read_argument(m);
-            break;
-        case 0xbf: /* CMP A */
-            set_flag(FLAG_ZERO, m);
-            break;
-        case 0xbd: /* CMP L */
-            if(m->l_register == m->accumulator) {
-                set_flag(FLAG_ZERO, m);
-            } else {
-                unset_flag(FLAG_ZERO, m);
-            }
-            break;
-        case 0xbe: /* CMP M */
-            if(m->memory[m->l_register] == m->accumulator) {
-                set_flag(FLAG_ZERO, m);
-            } else {
-                unset_flag(FLAG_ZERO, m);
-            }
-            break;
-        case 0xfe: /* CPI n */
-            if(m->accumulator == read_argument(m)) {
-                set_flag(FLAG_ZERO, m);
-            } else {
-                unset_flag(FLAG_ZERO, m);
-            }
-            break;
+        case 0x3c: /* INR A */ ++m->accu; break;
+        case 0x2c: /* INR L */ ++m->reg_l; break;
+        case 0x3d: /* DCR A */ --m->accu; break;
+        case 0x2d: /* DCR L */ --m->reg_l; break;
+        case 0x87: /* ADD A */ m->accu *= 2; break;
+        case 0x85: /* ADD L */ m->accu += m->reg_l; break;
+        case 0x86: /* ADD M */ m->accu += m->memory[m->reg_l]; break;
+        case 0xc6: /* ADI n */ m->accu += read_argument(m); break;
+        case 0x97: /* SUB A */ m->accu = 0; break;
+        case 0x95: /* SUB L */ m->reg_l = 0; break;
+        case 0x96: /* SUB M */ m->accu -= m->memory[m->reg_l]; break;
+        case 0xd6: /* SUI n */ m->accu -= read_argument(m); break;
+        case 0xbf: /* CMP A */ set_flag(FLAG_ZERO, m); break;
+        case 0xbd: /* CMP L */ compare(m->reg_l, m->accu, m); break;
+        case 0xbe: /* CMP M */ compare(m->memory[m->reg_l], m->accu, m); break;
+        case 0xfe: /* CPI n */ compare(m->accu, read_argument(m), m); break;
         /* ----- LOGIC ----- */
-        case 0xa7: /* ANA A */
-            /* nothing to do */
-            break;
-        case 0xa5: /* ANA L */
-            m->accumulator &= m->l_register;
-            break;
-        case 0xa6: /* ANA M */
-            m->accumulator &= m->memory[m->l_register];
-            break;
-        case 0xe6: /* ANI n */
-            m->accumulator &= read_argument(m);
-            break;
-        case 0xb7: /* ORA A */
-            /* nothing to do */
-            break;
-        case 0xb5: /* ORA L */
-            m->accumulator |= m->l_register;
-            break;
-        case 0xb6: /* ORA M */
-            m->accumulator |= m->memory[m->l_register];
-            break;
-        case 0xf6: /* ORI n */
-            m->accumulator |= read_argument(m);
-            break;
-        case 0xaf: /* XRA A */
-            m->accumulator = 0;
-            break;
-        case 0xad: /* XRA L */
-            m->accumulator ^= m->l_register;
-            break;
-        case 0xae: /* XRA M */
-            m->accumulator ^= m->memory[m->l_register];
-            break;
-        case 0xee: /* XRI n */
-            m->accumulator ^= read_argument(m);
-            break;
+        case 0xa7: /* ANA A */ /* nothing to do */ break;
+        case 0xa5: /* ANA L */ m->accu &= m->reg_l; break;
+        case 0xa6: /* ANA M */ m->accu &= m->memory[m->reg_l]; break;
+        case 0xe6: /* ANI n */ m->accu &= read_argument(m); break;
+        case 0xb7: /* ORA A */ /* nothing to do */ break;
+        case 0xb5: /* ORA L */ m->accu |= m->reg_l; break;
+        case 0xb6: /* ORA M */ m->accu |= m->memory[m->reg_l]; break;
+        case 0xf6: /* ORI n */ m->accu |= read_argument(m); break;
+        case 0xaf: /* XRA A */ m->accu = 0; break;
+        case 0xad: /* XRA L */ m->accu ^= m->reg_l; break;
+        case 0xae: /* XRA M */ m->accu ^= m->memory[m->reg_l]; break;
+        case 0xee: /* XRI n */ m->accu ^= read_argument(m); break;
         /* ----- BRANCH ----- */
-        case 0xc3: /* JMP adr */
-        case 0xcd: /* CALL adr */
-            m->program_counter = read_argument(m);
-            break;
+        case 0xc3: /* JMP adr  */ m->pc = read_argument(m); break;
+        case 0xcd: /* CALL adr */ call(read_argument(m), m); break;
         case 0xca: /* JZ adr */
+            if(m->flags & FLAG_ZERO) { m->pc = read_argument(m); }
         case 0xcc: /* CZ adr */
-            if(m->flags & FLAG_ZERO) {
-                m->program_counter = read_argument(m);
-            }
+            if(m->flags & FLAG_ZERO) { call(read_argument(m), m); }
             break;
         case 0xc4: /* CNZ adr */
+            if(!(m->flags & FLAG_ZERO)) { call(read_argument(m), m); }
         case 0xc2: /* JNZ adr */
-            if(!(m->flags & FLAG_ZERO)) {
-                m->program_counter = read_argument(m);
-            }
+            if(!(m->flags & FLAG_ZERO)) { m->pc = read_argument(m); }
             break;
         case 0xdc: /* CC adr */
+            if(m->flags & FLAG_CARRY) { call(read_argument(m), m); }
         case 0xda: /* JC adr */
-            if(m->flags & FLAG_CARRY) {
-                m->program_counter = read_argument(m);
-            }
+            if(m->flags & FLAG_CARRY) { m->pc = read_argument(m); }
             break;
         case 0xd2: /* JNC adr */
+            if(!(m->flags & FLAG_CARRY)) { call(read_argument(m), m); }
         case 0xd4: /* CNC adr */
-            if(!(m->flags & FLAG_CARRY)) {
-                m->program_counter = read_argument(m);
-            }
+            if(!(m->flags & FLAG_CARRY)) { m->pc = read_argument(m); }
             break;
-        case 0xc9: /* RET */
-            m->program_counter = m->memory[m->stack_pointer];
-            m->stack_pointer++;
-            break;
+        case 0xc9: /* RET */ m->pc = m->memory[m->sp]; ++m->sp; break;
         /* ----- SPECIAL ----- */
-        case 0x76: /* HLT */
-            m->halted = TRUE;
-            break;
-        case 0x00: /* NOP */
-            break;
-        case 0xfb: /* EI */
-            m->interrupt_enabled = TRUE;
-            break;
-        case 0xf3: /* DI */
-            m->interrupt_enabled = FALSE;
-            break;
+        case 0x76: /* HLT */ m->halted = TRUE; break;
+        case 0x00: /* NOP */ break;
+        case 0xfb: /* EI  */ m->interrupt_enabled = TRUE; break;
+        case 0xf3: /* DI  */ m->interrupt_enabled = FALSE; break;
     }
 }
 
@@ -329,8 +221,8 @@ int emulate(void)
 
     while(!machine.halted) {
 
-        next_ins = machine.memory[machine.program_counter];
-        ++machine.program_counter;
+        next_ins = machine.memory[machine.pc];
+        ++machine.pc;
         ++machine.step_count;
 
         process_instruction(next_ins, &machine);
@@ -374,8 +266,11 @@ int main(int argc, char **argv)
             case 'v':
                 config.verbose_mode = TRUE;
                 break;
-            case 'i':
+            case 's':
                 config.step_time_ms = atoi(optarg);
+                break;
+            case 'i':
+                config.interactive_mode = TRUE;
                 break;
             default:
                 print_usage(process_name);

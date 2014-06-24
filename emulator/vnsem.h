@@ -37,13 +37,11 @@ typedef struct _vnsem_machine {
     /* the memory unit */
     uint8_t memory[256];
     /* register */
-    uint8_t program_counter;
-    uint8_t address_buffer;
-    uint8_t data_buffer;
-    uint8_t l_register;
-    uint8_t stack_pointer;
+    uint8_t pc;
+    uint8_t reg_l;
+    uint8_t sp;
     /* alu */ 
-    uint8_t accumulator;
+    uint8_t accu;
     uint8_t flags;
 } vnsem_machine;
 

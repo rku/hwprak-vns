@@ -3,7 +3,7 @@
 %{
 #include <stdlib.h>
 #include <stdint.h>
-#include "vnsasm.tab.h"
+#include "grammar.tab.h"
 %}
 
 %option nounput
@@ -24,6 +24,8 @@ HEXNUM              0[xX][[:xdigit:]]+
                         yylval.ival = strtol(yytext, NULL, 16);
                         return TOK_INT;
                     }
+
+;.*\n               {  /* comment */   }
 
 ,                   { return TOK_SEP;  }
 

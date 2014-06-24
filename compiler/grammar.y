@@ -69,12 +69,8 @@ asnasmfile:
      ;
 
 line:
-    line block
-    | block
-    ;
-
-block:
-    instruction
+    line instruction
+    | instruction
     ;
 
 instruction:

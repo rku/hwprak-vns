@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -O2 -g
+CFLAGS=-Wall -O2 -g -I../include/
 LIBS=-lfl
 LDFLAGS=
 BISON=bison
@@ -7,7 +7,7 @@ BFLAGS=-d
 LEX=flex
 LFLAGS=
 
-vnsasm: vnsasm.c lex.yy.c vns.tab.c
+vnsasm: vnsasm.c vnsasm.h lex.yy.c vns.tab.c
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 lex.yy.c: vns.l vns.tab.h

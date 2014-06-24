@@ -65,7 +65,6 @@ void reset_machine(vnsem_machine *machine)
 {
     /* set everything to zero */
     memset(machine, 0, sizeof(*machine));
-    machine->sp = 255;
 }
 
 void load_program(vnsem_machine *machine)
@@ -112,7 +111,7 @@ void call(uint8_t addr, vnsem_machine *machine)
 {
     --machine->sp;
     machine->memory[machine->sp] = machine->pc;
-    machine->sp = addr;
+    machine->pc = addr;
 }
 
 void compare(uint8_t a, uint8_t b, vnsem_machine *machine)
@@ -181,21 +180,25 @@ void process_instruction(uint8_t ins, vnsem_machine *m)
         case 0xcd: /* CALL adr */ call(read_argument(m), m); break;
         case 0xca: /* JZ adr */
             if(m->flags & FLAG_ZERO) { m->pc = read_argument(m); }
+            break;
         case 0xcc: /* CZ adr */
             if(m->flags & FLAG_ZERO) { call(read_argument(m), m); }
             break;
         case 0xc4: /* CNZ adr */
             if(!(m->flags & FLAG_ZERO)) { call(read_argument(m), m); }
+            break;
         case 0xc2: /* JNZ adr */
             if(!(m->flags & FLAG_ZERO)) { m->pc = read_argument(m); }
             break;
         case 0xdc: /* CC adr */
             if(m->flags & FLAG_CARRY) { call(read_argument(m), m); }
+            break;
         case 0xda: /* JC adr */
             if(m->flags & FLAG_CARRY) { m->pc = read_argument(m); }
             break;
         case 0xd2: /* JNC adr */
             if(!(m->flags & FLAG_CARRY)) { call(read_argument(m), m); }
+            break;
         case 0xd4: /* CNC adr */
             if(!(m->flags & FLAG_CARRY)) { m->pc = read_argument(m); }
             break;

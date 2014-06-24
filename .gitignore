@@ -1,5 +1,5 @@
 *.bin
-compiler/vnsasm.tab.*
+compiler/grammar.tab.*
 compiler/lexer.c
 compiler/vnsasm
 emulator/vnsem

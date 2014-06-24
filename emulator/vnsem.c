@@ -33,9 +33,9 @@ void print_machine_state(vnsem_machine *machine)
             machine->stack_pointer);
     printf("A:[V=0x%.2x C=%.1i Z=%.1i S=%.1i]\n",
             machine->accumulator,
-            machine->flags & FLAG_CARRY,
-            machine->flags & FLAG_ZERO,
-            machine->flags & FLAG_SIGN);
+            (machine->flags & FLAG_CARRY) ? 1 : 0,
+            (machine->flags & FLAG_ZERO) ? 1 : 0,
+            (machine->flags & FLAG_SIGN) ? 1 : 0);
 }
 
 void print_key(void)
@@ -98,7 +98,9 @@ void set_flag(uint8_t flag, vnsem_machine *machine)
 
 void unset_flag(uint8_t flag, vnsem_machine *machine)
 {
-    machine->flags ^= flag;
+    if(machine->flags & flag) {
+        machine->flags ^= flag;
+    }
 }
 
 uint8_t read_argument(vnsem_machine *machine)

@@ -3,6 +3,8 @@ CFLAGS=-Wall -O2
 LIBS=
 LDFLAGS=
 
+.PONY: vnsasm vnsem all
+
 all: vnsasm vnsem
 
 vnsasm:

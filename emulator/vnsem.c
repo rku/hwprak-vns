@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <readline/readline.h>
 
 #include "globals.h"
 #include "vnsem.h"
@@ -123,6 +124,22 @@ void compare(uint8_t a, uint8_t b, vnsem_machine *machine)
     }
 }
 
+void user_output(uint8_t port, vnsem_machine *machine)
+{
+    printf("PROGRAM OUTPUT> 0x%x (%i)\n", machine->accu, machine->accu);
+}
+
+void user_input(uint8_t port, vnsem_machine *machine)
+{
+    short int value;
+
+    while(1 != sscanf(readline("PROGRAM INPUT> "), "%hd", &value)) {
+        printf("Invalid input!\n");
+    }
+
+    machine->accu = value;
+}
+
 void process_instruction(uint8_t ins, vnsem_machine *m)
 {
     switch(ins) {
@@ -143,8 +160,8 @@ void process_instruction(uint8_t ins, vnsem_machine *m)
         case 0xf1: /* POP A   */ m->accu = m->memory[m->sp]; ++m->sp; break;
         case 0xe1: /* POP L   */ m->reg_l = m->memory[m->sp]; ++m->sp; break;
         case 0xfd: /* POP FL  */ m->flags = m->memory[m->sp]; ++m->sp; break;
-        case 0xdb: /* IN adr  */ break;
-        case 0xd3: /* OUT adr */ break;
+        case 0xdb: /* IN adr  */ user_input(read_argument(m), m); break;
+        case 0xd3: /* OUT adr */ user_output(read_argument(m), m); break;
         /* ------ ARITHMETIC  ------ */
         case 0x3c: /* INR A */ ++m->accu; break;
         case 0x2c: /* INR L */ ++m->reg_l; break;

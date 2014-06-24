@@ -1,7 +1,6 @@
 CC=gcc
-LIBS=
 CFLAGS=-Wall -O2 -I ../include/
-LDFLAGS=
+LDFLAGS=-lreadline
 
 vnsem: vnsem.c vnsem.h
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)

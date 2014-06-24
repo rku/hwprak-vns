@@ -4,3 +4,8 @@ at university of technology Dresden (TUD).
 
 If you do not know that this is for, you probably  do not
 need it.
+
+Example usage:
+
+  vnsasm -o intro.bin examples/intro.asm
+  vnsem intro.bin

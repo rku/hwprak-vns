@@ -8,6 +8,14 @@
 #define EXIT_OK     0
 #define EXIT_ERROR  1
 
+#ifndef TRUE
+#define TRUE        1
+#endif
+
+#ifndef FALSE
+#define FALSE       0
+#endif
+
 void yyerror(char *error);
 int yyparse(void);
 

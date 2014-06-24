@@ -9,6 +9,7 @@
 #define EXIT_ERROR  1
 
 void yyerror(char *error);
+int yyparse(void);
 
 void prc_simple_instr(uint8_t ins);
 void prc_addr_instr(uint8_t ins, uint8_t addr);

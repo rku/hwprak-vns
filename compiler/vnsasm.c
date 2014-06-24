@@ -1,8 +1,7 @@
 #include "vnsasm.h"
 
-void yyparse(void);
-
 FILE *outfile = NULL;
+char *outfile_name = "program.bin";
 
 void yyerror(char *error)
 {
@@ -39,13 +38,15 @@ int compile_file(char *filename)
         return EXIT_ERROR;
     }
 
-    if(NULL == (outfile = fopen("program.bin", "w+"))) {
-        perror("program.bin");
+    if(NULL == (outfile = fopen(outfile_name, "w+"))) {
+        perror(outfile_name);
         return EXIT_ERROR;
     }
 
-    fprintf(stdout, "Compiling %s...\n", filename);
-    yyparse();
+    fprintf(stdout, "Compiling %s into %s...\n", filename, outfile_name);
+    if(0 != yyparse()) {
+        return EXIT_ERROR;
+    }
 
     fclose(yyin);
     fclose(outfile);

@@ -13,4 +13,4 @@ vnsem:
 
 clean:
 	@make -C compiler clean
-	@make -C simulator clean
+	@make -C emulator clean

@@ -12,17 +12,24 @@ vnsem_configuration config;
 void print_machine_state(vnsem_machine *machine)
 {
     printf("#%.3i  ", machine->step_count);
-    printf("R:[pc=%.2x ab=%.2x db=%.2x l=%.2x sp=%.2x]  ",
+    printf("R:[PC=0x%.2x L=0x%.2x SP=0x%.2x]  ",
             machine->program_counter,
-            machine->address_buffer,
-            machine->data_buffer,
             machine->l_register,
             machine->stack_pointer);
-    printf("A:[v=%.2x c=%.1i z=%.1i s=%.1i]\n",
+    printf("A:[V=0x%.2x C=%.1i Z=%.1i S=%.1i]\n",
             machine->accumulator,
             machine->flags & FLAG_CARRY,
             machine->flags & FLAG_ZERO,
             machine->flags & FLAG_SIGN);
+}
+
+void print_key(void)
+{
+    printf("\n #002     Step count\n");
+    printf(" R:[...]  Registers: program counter (PC), low register (L)\n");
+    printf("                     and stack pointer (SP)\n");
+    printf(" A:[...]  Accumulator: value (V), carry (C), zero (Z) and\n");
+    printf("                       sign (S) flags\n\n");
 }
 
 void dump_memory(vnsem_machine *machine)
@@ -43,6 +50,7 @@ void reset_machine(vnsem_machine *machine)
 {
     /* set everything to zero */
     memset(machine, 0, sizeof(*machine));
+    machine->stack_pointer = 255;
 }
 
 void load_program(vnsem_machine *machine)
@@ -85,10 +93,6 @@ uint8_t read_argument(vnsem_machine *machine)
 
 void process_instruction(uint8_t ins, vnsem_machine *m)
 {
-    if(config.verbose_mode) {
-        printf("Processing instruction %x\n", ins);
-    }
-
     switch(ins) {
         /* ----- TRANSFER ----- */
         case 0x7d: /* MOV A,L */
@@ -249,27 +253,36 @@ void process_instruction(uint8_t ins, vnsem_machine *m)
             break;
         /* ----- BRANCH ----- */
         case 0xc3: /* JMP adr */
-            break;
-        case 0xca: /* JZ adr */
-            break;
-        case 0xc2: /* JNZ adr */
-            break;
-        case 0xda: /* JC adr */
-            break;
-        case 0xd2: /* JNC adr */
-            break;
         case 0xcd: /* CALL adr */
             m->program_counter = read_argument(m);
             break;
+        case 0xca: /* JZ adr */
         case 0xcc: /* CZ adr */
+            if(m->flags & FLAG_ZERO) {
+                m->program_counter = read_argument(m);
+            }
             break;
         case 0xc4: /* CNZ adr */
+        case 0xc2: /* JNZ adr */
+            if(!(m->flags & FLAG_ZERO)) {
+                m->program_counter = read_argument(m);
+            }
             break;
         case 0xdc: /* CC adr */
+        case 0xda: /* JC adr */
+            if(m->flags & FLAG_CARRY) {
+                m->program_counter = read_argument(m);
+            }
             break;
+        case 0xd2: /* JNC adr */
         case 0xd4: /* CNC adr */
+            if(!(m->flags & FLAG_CARRY)) {
+                m->program_counter = read_argument(m);
+            }
             break;
         case 0xc9: /* RET */
+            m->program_counter = m->memory[m->stack_pointer];
+            m->stack_pointer++;
             break;
         /* ----- SPECIAL ----- */
         case 0x76: /* HLT */
@@ -295,6 +308,8 @@ int emulate(void)
 
     load_program(&machine);
 
+    print_key();
+
     while(!machine.halted) {
 
         next_ins = machine.memory[machine.program_counter];
@@ -304,6 +319,8 @@ int emulate(void)
         process_instruction(next_ins, &machine);
 
         print_machine_state(&machine);
+
+        usleep(config.step_time_ms * 1000);
     }
 
     return EXIT_SUCCESS;
@@ -329,7 +346,7 @@ int main(int argc, char **argv)
 
     config.interactive_mode = FALSE;
     config.verbose_mode = FALSE;
-    config.step_time_ms = 1000;
+    config.step_time_ms = 500;
     config.infile_name = NULL;
 
     while(-1 != (opt = getopt(argc, argv, "hvis:"))) {

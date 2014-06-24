@@ -3,12 +3,13 @@
 %{
 #include <stdlib.h>
 #include <stdint.h>
-#include "vns.tab.h"
+#include "vnsasm.tab.h"
 %}
 
 %option nounput
 %option noinput
 %option yylineno
+%option outfile="lexer.c"
 
 DECNUM              [0-9]+
 HEXNUM              0[xX][[:xdigit:]]+

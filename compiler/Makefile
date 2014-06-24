@@ -7,16 +7,16 @@ BFLAGS=-d
 LEX=flex
 LFLAGS=
 
-vnsasm: vnsasm.c vnsasm.h lex.yy.c vns.tab.c
+vnsasm: vnsasm.c vnsasm.h lexer.c vnsasm.tab.c
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
-lex.yy.c: vns.l vns.tab.h
+lexer.c: vnsasm.l vnsasm.tab.h
 	$(LEX) -o $@ $< $(FLEXARGS)
 
-vns.tab.h: vns.y
+vnsasm.tab.h: vnsasm.y
 	$(BISON) $(BFLAGS) $<
 
-vns.tab.c: vns.tab.h
+vnsasm.tab.c: vnsasm.tab.h
 
 clean:
-	@rm -f *.o lex.yy.c vns.tab.c vns.tab.h vns.dot vnsasm
+	@rm -f *.o lexer.c vnsasm.tab.c vnsasm.tab.h vnsasm.dot vnsasm

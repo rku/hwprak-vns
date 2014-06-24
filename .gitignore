@@ -1,5 +1,5 @@
 *.bin
-compiler/vns.tab.*
-compiler/lex.yy.c
+compiler/vnsasm.tab.*
+compiler/lexer.c
 compiler/vnsasm
 emulator/vnsem

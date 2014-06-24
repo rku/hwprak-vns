@@ -4,6 +4,13 @@
 #include <stdio.h>
 #include <stdint.h>
 
+typedef struct _vnsasm_configuration {
+    FILE *outfile_d;
+    char *outfile_name;
+    char *infile_name;
+    uint8_t verbose_mode;
+} vnsasm_configuration;
+
 void yyerror(char *error);
 int yyparse(void);
 

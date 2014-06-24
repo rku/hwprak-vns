@@ -6,14 +6,7 @@
 #include "globals.h"
 #include "vnsasm.h"
 
-typedef struct _configuration {
-    FILE *outfile_d;
-    char *outfile_name;
-    char *infile_name;
-    uint8_t verbose_mode;
-} configuration;
-
-configuration config;
+vnsasm_configuration config;
 
 void yyerror(char *error)
 {
@@ -105,8 +98,8 @@ int main(int argc, char **argv)
     unsigned int opt;
     char *process_name = simple_basename(argv[0]);
 
-    printf("TUD HWPRAK Von-Neumann Simulator - ASM Compiler\n");
-    printf("Version %s - René Küttner <rene@bitkanal.net>\n", VERSION);
+    printf(BANNER_LINE1, "ASM Compiler");
+    printf(BANNER_LINE2, VERSION);
 
     /* initialize default configuration */
     config.outfile_d = NULL;

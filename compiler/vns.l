@@ -1,8 +1,8 @@
 /* lexer */
 
 %{
-#include <stdint.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "vns.tab.h"
 %}
 
@@ -17,11 +17,11 @@ HEXNUM              0[xX][[:xdigit:]]+
 
 {DECNUM}            {
                         yylval.ival = atoi(yytext);
-                        return TOK_N;
+                        return TOK_INT;
                     }
 {HEXNUM}            {
                         yylval.ival = strtol(yytext, NULL, 16);
-                        return TOK_ADDR;
+                        return TOK_INT;
                     }
 
 ,                   { return TOK_SEP;  }
@@ -30,6 +30,7 @@ A                   { return TOK_A;    }
 L                   { return TOK_L;    }
 M                   { return TOK_M;    }
 FL                  { return TOK_FL;   }
+SP                  { return TOK_SP;   }
 
 MOV                 { return TOK_MOV;  }
 MVI                 { return TOK_MVI;  }

@@ -1,0 +1,6 @@
+This is a very minimalistic compiler/emulator for the
+Von-Neumann computer used in the hardware practice course
+at university of technology Dresden (TUD).
+
+If you do not know that this is for, you probably  do not
+need it.

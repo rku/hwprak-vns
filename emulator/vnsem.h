@@ -20,7 +20,6 @@ typedef struct _vnsem_machine {
     uint8_t interrupt_enabled;
     /* the memory unit */
     uint8_t memory[256];
-    uint8_t curr_mem_addr;
     /* register */
     uint8_t program_counter;
     uint8_t address_buffer;

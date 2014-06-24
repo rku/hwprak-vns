@@ -15,23 +15,25 @@ typedef struct _vnsem_configuration {
 typedef uint8_t led;
 
 typedef struct _vnsem_machine {
-    int step_count;
-    char halted;
+    unsigned int step_count;
+    unsigned int halted;
+    uint8_t interrupt_enabled;
     /* the memory unit */
-    char memory[256];
-    char curr_mem_data;
-    char curr_mem_addr;
+    uint8_t memory[256];
+    uint8_t curr_mem_addr;
     /* register */
-    char program_counter;
-    char address_buffer;
-    char data_buffer;
-    char l_register;
-    char stack_pointer;
+    uint8_t program_counter;
+    uint8_t address_buffer;
+    uint8_t data_buffer;
+    uint8_t l_register;
+    uint8_t stack_pointer;
     /* alu */ 
-    char accumulator;
-    char carry_flag;
-    char zero_flag;
-    char sign_flag;
+    uint8_t accumulator;
+    uint8_t flags;
 } vnsem_machine;
+
+#define FLAG_CARRY  0x1
+#define FLAG_ZERO   0x2
+#define FLAG_SIGN   0x4
 
 #endif /* VNSEM_H */

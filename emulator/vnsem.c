@@ -23,9 +23,9 @@ void print_machine_state(vnsem_machine *machine)
             machine->stack_pointer);
     printf("A:[v=%.2x c=%.1i z=%.1i s=%.1i]\n",
             machine->accumulator,
-            machine->carry_flag,
-            machine->zero_flag,
-            machine->sign_flag);
+            machine->flags & FLAG_CARRY,
+            machine->flags & FLAG_ZERO,
+            machine->flags & FLAG_SIGN);
 }
 
 void reset_machine(vnsem_machine *machine)
@@ -61,36 +61,52 @@ void process_instruction(uint8_t ins, vnsem_machine *machine)
             machine->accumulator = machine->memory[machine->l_register];
             break;
         case 0x77: /* MOV M,A */
-            machine->memory[machine->l_register] = meachine->accumulator;
+            machine->memory[machine->l_register] = machine->accumulator;
             break;
         case 0x3e: /* MVI A,n */
             machine->accumulator = read_byte();
             break;
         case 0x3a: /* LDA adr */
-            machine->accumulator = machine->memory[read_byte()]
+            machine->accumulator = machine->memory[read_byte()];
             break;
         case 0x32: /* STA adr */
             machine->memory[read_byte()] = machine->accumulator;
             break;
         case 0x6f: /* MOV L,A */
+            machine->l_register = machine->accumulator;
             break;
         case 0x6e: /* MOV L,M */
+            machine->l_register = machine->memory[machine->l_register];
             break;
         case 0x2e: /* MVI L,n */
+            machine->l_register = read_byte();
             break;
         case 0x31: /* LXI SP,n */
+            machine->stack_pointer = read_byte();
             break;
         case 0xf5: /* PUSH A */
+            --machine->stack_pointer;
+            machine->memory[machine->stack_pointer] = machine->accumulator;
             break;
         case 0xe5: /* PUSH L */
+            --machine->stack_pointer;
+            machine->memory[machine->stack_pointer] = machine->l_register;
             break;
         case 0xed: /* PUSH FL */
+            --machine->stack_pointer;
+            machine->memory[machine->stack_pointer] = machine->flags;
             break;
         case 0xf1: /* POP A */
+            machine->accumulator = machine->memory[machine->stack_pointer];
+            ++machine->stack_pointer;
             break;
         case 0xe1: /* POP L */
+            machine->l_register = machine->memory[machine->stack_pointer];
+            ++machine->stack_pointer;
             break;
         case 0xfd: /* POP FL */
+            machine->flags = machine->memory[machine->stack_pointer];
+            ++machine->stack_pointer;
             break;
         case 0xdb: /* IN adr */
             break;
@@ -98,28 +114,40 @@ void process_instruction(uint8_t ins, vnsem_machine *machine)
             break;
         /* ------ ARITHMETIC  ------ */
         case 0x3c: /* INR A */
+            ++machine->accumulator;
             break;
         case 0x2c: /* INR L */
+            ++machine->l_register;
             break;
         case 0x3d: /* DCR A */
+            --machine->accumulator;
             break;
         case 0x2d: /* DCR L */
+            --machine->l_register;
             break;
         case 0x87: /* ADD A */
+            machine->accumulator *= 2;
             break;
         case 0x85: /* ADD L */
+            machine->accumulator += machine->l_register;
             break;
         case 0x86: /* ADD M */
+            machine->accumulator += machine->memory[machine->curr_mem_addr];
             break;
         case 0xc6: /* ADI n */
+            machine->accumulator += read_byte();
             break;
         case 0x97: /* SUB A */
+            machine->accumulator = 0;
             break;
         case 0x95: /* SUB L */
+            machine->l_register = 0;
             break;
         case 0x96: /* SUB M */
+            machine->accumulator -= machine->memory[machine->curr_mem_addr];
             break;
         case 0xd6: /* SUI n */
+            machine->accumulator -= read_byte();
             break;
         case 0xbf: /* CMP A */
             break;
@@ -179,12 +207,15 @@ void process_instruction(uint8_t ins, vnsem_machine *machine)
             break;
         /* ----- SPECIAL ----- */
         case 0x76: /* HLT */
+            machine->halted = TRUE;
             break;
         case 0x00: /* NOP */
             break;
         case 0xfb: /* EI */
+            machine->interrupt_enabled = TRUE;
             break;
         case 0xf3: /* DI */
+            machine->interrupt_enabled = FALSE;
             break;
     }
 }
@@ -203,7 +234,7 @@ int emulate(void)
     while(!feof(config.infile_d) && !machine.halted) {
         uint8_t instruction = read_byte();
         ++machine.step_count;
-        process_instruction(instruction);
+        process_instruction(instruction, &machine);
         print_machine_state(&machine);
     }
 

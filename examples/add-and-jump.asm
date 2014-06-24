@@ -1,0 +1,10 @@
+
+MVI A,1
+MVI L,7
+ADD L
+CMP L
+MVI L,8
+CMP L
+JZ 0x2
+HLT
+

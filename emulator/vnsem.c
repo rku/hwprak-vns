@@ -252,6 +252,8 @@ int emulate(void)
         usleep(config.step_time_ms * 1000);
     }
 
+    printf("HALTED\n");
+
     return EXIT_SUCCESS;
 }
 

@@ -1,0 +1,31 @@
+; init
+MVI L,100
+MVI A,0
+MOV M,A
+; input factor1
+IN 0
+MVI L,101
+MOV M,A
+; input factor2
+IN 0
+MVI L,102
+MOV M,A
+; loop
+MVI L,102
+MOV A,M
+CPI 0
+JZ 0x23
+DCR A
+MOV M,A
+MVI L,100
+MOV A,M
+MVI L,101
+ADD M
+MVI L,100
+MOV M,A
+JMP 0x0f
+; done
+MVI L,100
+MOV A,M
+OUT 0
+HLT

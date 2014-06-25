@@ -101,9 +101,17 @@ int inscmp(const void *key, const void *other)
     vns_instruction *key_ins = (vns_instruction*)key;
     vns_instruction *other_ins = (vns_instruction*)other;
 
-    if(0 != (cmp = strcmp(key_ins->mnemonic, other_ins->mnemonic))) return cmp;
-    if(key_ins->at1 != other_ins->at1) return (key_ins->at1 - other_ins->at1);
-    if(key_ins->at2 != other_ins->at2) return (key_ins->at2 - other_ins->at2);
+    if(0 != (cmp = strcmp(key_ins->mnemonic, other_ins->mnemonic))) {
+        return cmp;
+    }
+
+    if(!(key_ins->at1 & other_ins->at1)) {
+        return (key_ins->at1 - other_ins->at1);
+    }
+
+    if(!(key_ins->at2 & other_ins->at2)) {
+        return (key_ins->at2 - other_ins->at2);
+    }
 
     return 0;
 }
@@ -113,7 +121,7 @@ int inscmp(const void *key, const void *other)
  * pointer on success or NULL if no such instruction can be found. This
  * lookup is done with binary search in O(log(n)).
  */
-vns_instruction *find_mnemonic(char *mnemonic, argtype at1, argtype at2)
+vns_instruction *is_find_mnemonic(char *mnemonic, argtype at1, argtype at2)
 {
     size_t ins_size;
     unsigned int n;
@@ -137,7 +145,7 @@ vns_instruction *find_mnemonic(char *mnemonic, argtype at1, argtype at2)
  * Search for an instruction with the given opcode and return a pointer
  * to it. If it cannot be found, NULL is returned.
  */
-vns_instruction *find_opcode(uint8_t opcode)
+vns_instruction *is_find_opcode(uint8_t opcode)
 {
     size_t ins_size;
     unsigned int n, i;

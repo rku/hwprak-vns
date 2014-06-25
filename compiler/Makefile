@@ -7,8 +7,10 @@ BFLAGS=-d
 LEX=flex
 LFLAGS=
 
-vnsasm: vnsasm.c vnsasm.h lexer.c grammar.tab.c ../common/utils.c
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+vnsasm: vnsasm.c vnsasm.h lexer.c grammar.tab.c \
+		../common/utils.c ../common/instructionset.c \
+		../include/utils.h ../include/globals.h ../include/instructionset.h
+	$(CC) -o $@ $(filter %c, $^) $(CFLAGS) $(LIBS)
 
 lexer.c: lexer.l grammar.tab.h
 	$(LEX) -o $@ $< $(FLEXARGS)

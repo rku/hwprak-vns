@@ -21,14 +21,15 @@
 
 typedef uint8_t argtype;
 
-#define AT_NONE     0x01
-#define AT_INT      0x02
-#define AT_ADDR     0x04
-#define AT_REG_A    0x08
-#define AT_REG_L    0x10
-#define AT_REG_FL   0x20
-#define AT_REG_SP   0x40
-#define AT_MEM      0x80
+#define AT_NONE     0x00
+#define AT_INT      0x01
+#define AT_ADDR     0x03    // sets AT_INT bit too
+#define AT_REG_A    0x04
+#define AT_REG_L    0x08
+#define AT_REG_FL   0x10
+#define AT_REG_SP   0x20
+#define AT_MEM      0x40
+#define AT_LABEL    0x80    // reserved
 
 typedef struct _vns_instruction {
     char *mnemonic;
@@ -37,8 +38,8 @@ typedef struct _vns_instruction {
     uint8_t opcode;
 } vns_instruction;
 
-vns_instruction *find_mnemonic(char *mnemonic, argtype at1, argtype at2);
-vns_instruction *find_opcode(uint8_t opcode);
+vns_instruction *is_find_mnemonic(char *mnemonic, argtype at1, argtype at2);
+vns_instruction *is_find_opcode(uint8_t opcode);
 
 extern vns_instruction vns_instructionset[];
 

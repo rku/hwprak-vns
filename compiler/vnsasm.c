@@ -17,6 +17,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdarg.h>
+
+#include "instructionset.h"
 
 #include "utils.h"
 #include "vnsasm.h"
@@ -59,38 +62,27 @@ void write_byte(uint8_t byte)
     ++(config.program->counter);
 }
 
+void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t iarg)
+{
+    vns_instruction *ins = is_find_mnemonic(mnemonic, at1, at2);
+
+    if(NULL == ins) {
+        fprintf(stderr, "Error near line %i: ", yylineno);
+        fprintf(stderr, "Unknown instruction '%s' or ", mnemonic);
+        fprintf(stderr, "invalid argument types!");
+        exit(EXIT_FAILURE);
+    }
+
+    write_byte(ins->opcode);
+
+    if((ins->at1 & AT_INT) || (ins->at2 & AT_INT)) {
+        write_byte(iarg);
+    }
+}
+
 void prc_offset(uint8_t offset)
 {
     config.program->counter = offset;
-}
-
-void prc_smpl_instr(uint8_t ins)
-{
-    if(config.verbose_mode) {
-        printf("Compiling instruction %x.\n", ins);
-    }
-
-    write_byte(ins);
-}
-
-void prc_addr_instr(uint8_t ins, uint8_t addr)
-{
-    if(config.verbose_mode) {
-        printf("Compiling instruction %x with address arg %x.\n", ins, addr);
-    }
-
-    write_byte(ins);
-    write_byte(addr);
-}
-
-void prc_cons_instr(uint8_t ins, uint8_t c)
-{
-    if(config.verbose_mode) {
-        printf("Compiling instruction %x with constant arg %x.\n", ins, c);
-    }
-
-    write_byte(ins);
-    write_byte(c);
 }
 
 int compile(void)

@@ -21,6 +21,7 @@
 #include <stdint.h>
 
 #include "globals.h"
+#include "instructionset.h"
 
 #define MEMORY_UNIT_SIZE 256
 
@@ -43,10 +44,8 @@ void yyerror(char *error);
 void write_byte(uint8_t byte);
 void write_program();
 
+void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t iarg);
 void prc_offset(uint8_t offset);
-void prc_smpl_instr(uint8_t ins);
-void prc_addr_instr(uint8_t ins, uint8_t addr);
-void prc_cons_instr(uint8_t ins, uint8_t c);
 
 extern FILE *yyin;
 extern int yylineno;

@@ -5,7 +5,11 @@ at the University of Technology Dresden (TUD).
 If you do not know what this is for, you probably do not
 need it.
 
+In order to build the compiler and emulator, just type:
+
+  make
+
 Example usage:
 
-  vnsasm -o intro.bin examples/intro.asm
-  vnsem intro.bin
+  vnsasm -o multiply.bin examples/multiply.asm
+  vnsem multiply.bin

@@ -277,7 +277,7 @@ int main(int argc, char **argv)
 
     config.interactive_mode = FALSE;
     config.verbose_mode = FALSE;
-    config.step_time_ms = 500;
+    config.step_time_ms = 100;
     config.infile_name = NULL;
 
     while(-1 != (opt = getopt(argc, argv, "hvis:"))) {

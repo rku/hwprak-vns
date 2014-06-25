@@ -126,7 +126,7 @@ vns_instruction *is_find_mnemonic(char *mnemonic, argtype at1, argtype at2)
 {
     size_t ins_size;
     unsigned int n;
-    vns_instruction key, *result = NULL;
+    vns_instruction key, *result;
 
     key.mnemonic = mnemonic;
     key.at1 = at1;

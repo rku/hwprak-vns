@@ -21,6 +21,7 @@
 #include <readline/readline.h>
 
 #include "globals.h"
+#include "utils.h"
 #include "vnsem.h"
 
 vnsem_configuration config;
@@ -270,7 +271,7 @@ void print_usage(char *pname)
 int main(int argc, char **argv)
 {
     unsigned int opt;
-    char *process_name = argv[0];
+    char *process_name = util_basename(argv[0]);
 
     printf(BANNER_LINE1, "Emulator");
     printf(BANNER_LINE2, VERSION);

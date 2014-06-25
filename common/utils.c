@@ -14,20 +14,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef GLOBALS_H
-#define GLOBALS_H 1
+#include <stdio.h>
+#include <string.h>
 
-#define VERSION "0.1"
+#include "utils.h"
 
-#define BANNER_LINE1 "TUD HWPRAK Von-Neumann System - %s\n"
-#define BANNER_LINE2 "Version %s - René Küttner <rene@bitkanal.net>\n"
+char *util_basename(char *path)
+{
+    char *basename;
 
-#ifndef TRUE
-#define TRUE 1
-#endif
+    if(NULL != (basename = rindex(path, '/'))) {
+        return basename + 1;
+    }
 
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#endif /* GLOBALS_H */
+    return path;
+}

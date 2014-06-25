@@ -14,20 +14,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef GLOBALS_H
-#define GLOBALS_H 1
+#ifndef UTILS_H
+#define UTILS_H 1
 
-#define VERSION "0.1"
+char *util_basename(char *path);
 
-#define BANNER_LINE1 "TUD HWPRAK Von-Neumann System - %s\n"
-#define BANNER_LINE2 "Version %s - René Küttner <rene@bitkanal.net>\n"
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#endif /* GLOBALS_H */
+#endif /* UTILS_H */

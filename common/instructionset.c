@@ -90,7 +90,7 @@ vns_instruction vns_instructionset[] = {
 };
 
 /**
- * Compare two instruction sets. The comparison is done for the mnemonic,
+ * Compare two instructions. The comparison is done for the mnemonic,
  * argtype1 and argtype2 in exactly this order. If one of these elements
  * match the others, 0 is returned. Othwise a negative or positive value
  * is returned if *key* is less or greater than *other*.

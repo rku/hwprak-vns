@@ -92,8 +92,9 @@ vns_instruction vns_instructionset[] = {
 /**
  * Compare two instructions. The comparison is done for the mnemonic,
  * argtype1 and argtype2 in exactly this order. If one of these elements
- * match the others, 0 is returned. Othwise a negative or positive value
- * is returned if *key* is less or greater than *other*.
+ * from *key* match its counterpart from other, 0 is returned. Otherwise
+ * a * negative or positive value is returned if *key* is less or greater
+ * than *other*.
  */
 int inscmp(const void *key, const void *other)
 {

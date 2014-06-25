@@ -3,3 +3,4 @@ compiler/grammar.tab.*
 compiler/lexer.c
 compiler/vnsasm
 emulator/vnsem
+.*.swp

@@ -20,16 +20,27 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define MEMORY_UNIT_SIZE 256
+
+typedef struct _vnsasm_program {
+    uint8_t data[MEMORY_UNIT_SIZE];
+    uint8_t counter;
+} vnsasm_program;
+
 typedef struct _vnsasm_configuration {
-    FILE *outfile_d;
     char *outfile_name;
     char *infile_name;
     uint8_t verbose_mode;
+    vnsasm_program *program;
 } vnsasm_configuration;
 
-void yyerror(char *error);
 int yyparse(void);
+void yyerror(char *error);
 
+void write_byte(uint8_t byte);
+void write_program();
+
+void prc_offset(uint8_t offset);
 void prc_smpl_instr(uint8_t ins);
 void prc_addr_instr(uint8_t ins, uint8_t addr);
 void prc_cons_instr(uint8_t ins, uint8_t c);

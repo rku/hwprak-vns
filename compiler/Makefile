@@ -7,7 +7,7 @@ BFLAGS=-d
 LEX=flex
 LFLAGS=
 
-vnsasm: vnsasm.c vnsasm.h lexer.c grammar.tab.c
+vnsasm: vnsasm.c vnsasm.h lexer.c grammar.tab.c ../common/utils.c
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 lexer.c: lexer.l grammar.tab.h

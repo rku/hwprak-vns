@@ -30,6 +30,8 @@ void yyerror(char*);
 
 %token TOK_SEP;
 
+%token TOK_OFFSET;
+
 %left TOK_A;
 %left TOK_L;
 %left TOK_M;
@@ -88,11 +90,16 @@ line:
     ;
 
 instruction:
-    ins_transfer
+    asm_command
+    | ins_transfer
     | ins_arithmetic
     | ins_logic
     | ins_branch
     | ins_special
+    ;
+
+asm_command:
+    TOK_OFFSET TOK_INT                  { prc_offset($2);           }
     ;
 
 ins_transfer:

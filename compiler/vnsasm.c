@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "globals.h"
+#include "utils.h"
 #include "vnsasm.h"
 
 vnsasm_configuration config;
@@ -29,9 +30,32 @@ void yyerror(char *error)
     exit(EXIT_FAILURE);
 }
 
+void write_program()
+{
+    FILE *outfile = fopen(config.outfile_name, "w+");
+
+    if(NULL == outfile) {
+        perror(config.outfile_name);
+        exit(EXIT_FAILURE);
+    }
+
+    if(1 != fwrite((void*)config.program, MEMORY_UNIT_SIZE, 1, outfile)) {
+        perror(config.outfile_name);
+        exit(EXIT_FAILURE);
+    }
+
+    fclose(outfile);
+}
+
 void write_byte(uint8_t byte)
 {
-    fwrite((void*)&byte, 1, 1, config.outfile_d);
+    config.program->data[config.program->counter] = byte;
+    ++(config.program->counter);
+}
+
+void prc_offset(uint8_t offset)
+{
+    config.program->counter = offset;
 }
 
 void prc_smpl_instr(uint8_t ins)
@@ -70,20 +94,16 @@ int compile(void)
         return EXIT_FAILURE;
     }
 
-    /* FIXME: write to temporary file and rename on success */
-    if(NULL == (config.outfile_d = fopen(config.outfile_name, "w+"))) {
-        perror(config.outfile_name);
-        return EXIT_FAILURE;
-    }
-
     fprintf(stdout, "Compiling %s into %s...\n",
-            config.infile_name, config.outfile_name);
+            util_basename(config.infile_name),
+            util_basename(config.outfile_name));
+
     if(0 != yyparse()) {
         return EXIT_FAILURE;
     }
 
     fclose(yyin);
-    fclose(config.outfile_d);
+    write_program();
 
     return EXIT_SUCCESS;
 }
@@ -97,30 +117,23 @@ void print_usage(char *pname)
     printf("\n");
 }
 
-char *simple_basename(char *path)
-{
-    char *basename;
-
-    if(NULL != (basename = rindex(path, '/'))) {
-        return basename + 1;
-    }
-
-    return path;
-}
-
 int main(int argc, char **argv)
 {
     unsigned int opt;
-    char *process_name = simple_basename(argv[0]);
+    char *process_name = util_basename(argv[0]);
+    vnsasm_program program;
 
     printf(BANNER_LINE1, "ASM Compiler");
     printf(BANNER_LINE2, VERSION);
 
+    /* initialize program */
+    memset((void*)&program, 0, sizeof(program));
+
     /* initialize default configuration */
-    config.outfile_d = NULL;
     config.outfile_name = "program.bin";
     config.infile_name = NULL;
     config.verbose_mode = FALSE;
+    config.program = &program;
 
     /* parse cmdline arguments */
     while((opt = getopt(argc, argv, "ho:v")) != -1) {

@@ -41,6 +41,4 @@ typedef struct _vns_instruction {
 vns_instruction *is_find_mnemonic(char *mnemonic, argtype at1, argtype at2);
 vns_instruction *is_find_opcode(uint8_t opcode);
 
-extern vns_instruction vns_instructionset[];
-
 #endif /* INSTRUCTIONSET_H */

@@ -24,7 +24,7 @@
  * This list must be sorted by mnemonic,arg1,arg2 in ascending order
  * to allow application of binary search algorithms.
  */
-vns_instruction vns_instructionset[] = {
+static vns_instruction vns_instructionset[] = {
     /* mnemonic   arg1        arg2 */
     { "ADD",    AT_REG_A,   AT_NONE,    0x87 },
     { "ADD",    AT_REG_L,   AT_NONE,    0x85 },

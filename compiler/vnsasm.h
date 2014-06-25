@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "globals.h"
+
 #define MEMORY_UNIT_SIZE 256
 
 typedef struct _vnsasm_program {
@@ -31,6 +33,7 @@ typedef struct _vnsasm_configuration {
     char *outfile_name;
     char *infile_name;
     uint8_t verbose_mode;
+    uint8_t strip_trailing_zeros;
     vnsasm_program *program;
 } vnsasm_configuration;
 

@@ -18,7 +18,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "globals.h"
 #include "utils.h"
 #include "vnsasm.h"
 
@@ -32,6 +31,8 @@ void yyerror(char *error)
 
 void write_program()
 {
+    uint8_t *start, *end;
+    size_t size = MEMORY_UNIT_SIZE;
     FILE *outfile = fopen(config.outfile_name, "w+");
 
     if(NULL == outfile) {
@@ -39,7 +40,12 @@ void write_program()
         exit(EXIT_FAILURE);
     }
 
-    if(1 != fwrite((void*)config.program, MEMORY_UNIT_SIZE, 1, outfile)) {
+    if(config.strip_trailing_zeros && size) {
+        start = (uint8_t*)config.program;
+        for(end = start + size - 1; *end == 0 && end != start; --end) --size;
+    }
+
+    if(1 != fwrite((void*)config.program, size, 1, outfile)) {
         perror(config.outfile_name);
         exit(EXIT_FAILURE);
     }
@@ -110,10 +116,11 @@ int compile(void)
 
 void print_usage(char *pname)
 {
-    printf("\nUsage: %s [-h] | [-v] [-o <outfile>] <asmfile>\n\n", pname);
+    printf("\nUsage: %s [-hvz] [-o <outfile>] <asmfile>\n\n", pname);
     printf("  -h             Show this help text.\n");
     printf("  -v             Turn on verbose output.\n");
     printf("  -o <outfile>   Write compiled program to <outfile>.\n");
+    printf("  -z             Do NOT strip trailing zeros.\n");
     printf("\n");
 }
 
@@ -133,10 +140,11 @@ int main(int argc, char **argv)
     config.outfile_name = "program.bin";
     config.infile_name = NULL;
     config.verbose_mode = FALSE;
+    config.strip_trailing_zeros = TRUE;
     config.program = &program;
 
     /* parse cmdline arguments */
-    while((opt = getopt(argc, argv, "ho:v")) != -1) {
+    while((opt = getopt(argc, argv, "ho:vz")) != -1) {
         switch(opt) {
             case 'h':
                 print_usage(process_name);
@@ -146,6 +154,9 @@ int main(int argc, char **argv)
                 break;
             case 'o':
                 config.outfile_name = strdup(optarg);
+                break;
+            case 'z':
+                config.strip_trailing_zeros = FALSE;
                 break;
             default:
                 print_usage(process_name);

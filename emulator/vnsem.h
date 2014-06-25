@@ -45,8 +45,8 @@ typedef struct _vnsem_machine {
     uint8_t flags;
 } vnsem_machine;
 
-#define FLAG_CARRY  0x1
-#define FLAG_ZERO   0x2
-#define FLAG_SIGN   0x4
+#define F_CARRY 0x1
+#define F_ZERO  0x2
+#define F_SIGN  0x4
 
 #endif /* VNSEM_H */

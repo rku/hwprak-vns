@@ -1,4 +1,5 @@
 Things to do (list is not intended to be complete):
 
+ * clean-up/improve emulator output
  * move to cmake
  * implement labels

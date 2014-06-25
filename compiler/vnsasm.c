@@ -56,7 +56,7 @@ void write_program()
     fclose(outfile);
 }
 
-void write_byte(uint8_t byte)
+void push_byte(uint8_t byte)
 {
     config.program->data[config.program->counter] = byte;
     ++(config.program->counter);
@@ -73,10 +73,10 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t iarg)
         exit(EXIT_FAILURE);
     }
 
-    write_byte(ins->opcode);
+    push_byte(ins->opcode);
 
     if((ins->at1 & AT_INT) || (ins->at2 & AT_INT)) {
-        write_byte(iarg);
+        push_byte(iarg);
     }
 }
 

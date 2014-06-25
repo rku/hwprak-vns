@@ -117,22 +117,30 @@ void call(uint8_t addr, vnsem_machine *machine)
 
 void con_call(uint8_t addr, uint8_t flag, vnsem_machine *machine)
 {
-    if(machine->flags & flag) call(addr, machine);
+    if(machine->flags & flag) {
+        call(addr, machine);
+    }
 }
 
 void con_no_call(uint8_t addr, uint8_t flag, vnsem_machine *machine)
 {
-    if(!(machine->flags & flag)) call(addr, machine);
+    if(!(machine->flags & flag)) {
+        call(addr, machine);
+    }
 }
 
 void con_jmp(uint8_t addr, uint8_t flag, vnsem_machine *machine)
 {
-    if(machine->flags & flag) machine->pc = addr;
+    if(machine->flags & flag) {
+        machine->pc = addr;
+    }
 }
 
 void con_no_jmp(uint8_t addr, uint8_t flag, vnsem_machine *machine)
 {
-    if(!(machine->flags & flag)) machine->pc = addr;
+    if(!(machine->flags & flag)) {
+        machine->pc = addr;
+    }
 }
 
 void compare(uint8_t a, uint8_t b, vnsem_machine *machine)
@@ -281,7 +289,7 @@ int main(int argc, char **argv)
 
     config.interactive_mode = FALSE;
     config.verbose_mode = FALSE;
-    config.step_time_ms = 100;
+    config.step_time_ms = 20;
     config.infile_name = NULL;
 
     while(-1 != (opt = getopt(argc, argv, "hvis:"))) {

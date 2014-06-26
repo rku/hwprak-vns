@@ -218,7 +218,7 @@ int compile(void)
 
 void print_usage(char *pname)
 {
-    printf("\nUsage: %s [-hvz] [-o <outfile>] <asmfile>\n\n", pname);
+    printf("\nUsage: %s [-hvzr] [-o <outfile>] <asmfile>\n\n", pname);
     printf("  -h             Show this help text.\n");
     printf("  -v             Turn on verbose output.\n");
     printf("  -o <outfile>   Write compiled program to <outfile>.\n");

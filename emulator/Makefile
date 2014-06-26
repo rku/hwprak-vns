@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -O2 -I ../include/
+CFLAGS=-Wall -O2 -I ../common/
 LDFLAGS=-lreadline
 
 vnsem: vnsem.c vnsem.h ../common/utils.c

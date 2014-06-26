@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <readline/readline.h>
 
 #include "globals.h"
@@ -89,6 +90,12 @@ void load_program(vnsem_machine *machine)
     fclose(config.infile_d);
 
     printf("Done.\n");
+}
+
+void handle_interrupt(int signal)
+{
+    printf("\nInterrupt received.\n");
+    exit(EXIT_SUCCESS);
 }
 
 void set_flag(uint8_t flag, vnsem_machine *machine)
@@ -260,8 +267,9 @@ int emulate(void)
 
     print_key();
 
-    while (!machine.halted) {
+    signal(SIGINT, handle_interrupt);
 
+    while (1) {
         next_ins = machine.mem[machine.pc];
         ++machine.pc;
         ++machine.step_count;
@@ -271,9 +279,12 @@ int emulate(void)
         print_machine_state(&machine);
 
         usleep(config.step_time_ms * 1000);
-    }
 
-    printf("HALTED\n");
+        if (machine.halted) {
+            printf("Machine halted.\n");
+            while (machine.halted);
+        }
+    }
 
     return EXIT_SUCCESS;
 }

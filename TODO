@@ -1,6 +1,7 @@
 Things to do (list is not intended to be complete):
 
  * clean-up/improve emulator output
+ * implement proper carry and sign bit handling
  * move to cmake
  * implement labels
  * make parser reentrant

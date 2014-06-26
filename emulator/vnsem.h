@@ -32,10 +32,10 @@ typedef uint8_t led;
 
 typedef struct _vnsem_machine {
     unsigned int step_count;
-    unsigned int halted;
-    uint8_t interrupt_enabled;
+    uint8_t halted;
+    uint8_t int_active;
     /* the memory unit */
-    uint8_t memory[256];
+    uint8_t mem[256];
     /* register */
     uint8_t pc;
     uint8_t reg_l;

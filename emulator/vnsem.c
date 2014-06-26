@@ -49,13 +49,13 @@ void print_key(void)
     printf("\n");
 }
 
-void dump_memory(vnsem_machine *machine)
+void dump_mem(vnsem_machine *machine)
 {
     unsigned int i;
 
     printf("\n");
-    for (i = 0; i < sizeof(machine->memory); ++i) {
-        printf("%.2x ", machine->memory[i]);
+    for (i = 0; i < sizeof(machine->mem); ++i) {
+        printf("%.2x ", machine->mem[i]);
         if (0 == ((i+1) % 8)) {
             printf("\n");
         }
@@ -81,10 +81,10 @@ void load_program(vnsem_machine *machine)
     printf("Loading program...");
 
     while (1 == fread((void*)&instruction, 1, 1, config.infile_d)) {
-        machine->memory[addr++] = instruction;
+        machine->mem[addr++] = instruction;
     }
 
-    //dump_memory(machine);
+    //dump_mem(machine);
 
     fclose(config.infile_d);
 
@@ -105,13 +105,13 @@ void unset_flag(uint8_t flag, vnsem_machine *machine)
 
 uint8_t read_arg(vnsem_machine *machine)
 {
-    return machine->memory[machine->pc++];
+    return machine->mem[machine->pc++];
 }
 
 void call(uint8_t addr, vnsem_machine *machine)
 {
     --machine->sp;
-    machine->memory[machine->sp] = machine->pc;
+    machine->mem[machine->sp] = machine->pc;
     machine->pc = addr;
 }
 
@@ -172,71 +172,71 @@ void process_instruction(uint8_t ins, vnsem_machine *m)
 {
     switch(ins) {
         /* ----- TRANSFER ----- */
-        case 0x7d: /* MOV A,L */ m->accu = m->reg_l;                     break;
-        case 0x7e: /* MOV A,M */ m->accu = m->memory[m->reg_l];          break;
-        case 0x77: /* MOV M,A */ m->memory[m->reg_l] = m->accu;          break;
-        case 0x3e: /* MVI A,n */ m->accu = read_arg(m);                  break;
-        case 0x3a: /* LDA adr */ m->accu = m->memory[read_arg(m)];       break;
-        case 0x32: /* STA adr */ m->memory[read_arg(m)] = m->accu;       break;
-        case 0x6f: /* MOV L,A */ m->reg_l = m->accu;                     break;
-        case 0x6e: /* MOV L,M */ m->reg_l = m->memory[m->reg_l];         break;
-        case 0x2e: /* MVI L,n */ m->reg_l = read_arg(m);                 break;
-        case 0x31: /* LXI SP,n*/ m->sp = read_arg(m);                    break;
-        case 0xf5: /* PUSH A  */ --m->sp; m->memory[m->sp] = m->accu;    break;
-        case 0xe5: /* PUSH L  */ --m->sp; m->memory[m->sp] = m->reg_l;   break;
-        case 0xed: /* PUSH FL */ --m->sp; m->memory[m->sp] = m->flags;   break;
-        case 0xf1: /* POP A   */ m->accu  = m->memory[m->sp]; ++m->sp;   break;
-        case 0xe1: /* POP L   */ m->reg_l = m->memory[m->sp]; ++m->sp;   break;
-        case 0xfd: /* POP FL  */ m->flags = m->memory[m->sp]; ++m->sp;   break;
-        case 0xdb: /* IN adr  */ user_input(read_arg(m), m);             break;
-        case 0xd3: /* OUT adr */ user_output(read_arg(m), m);            break;
+        case 0x7d: /* MOV A,L */ m->accu = m->reg_l;                   break;
+        case 0x7e: /* MOV A,M */ m->accu = m->mem[m->reg_l];           break;
+        case 0x77: /* MOV M,A */ m->mem[m->reg_l] = m->accu;           break;
+        case 0x3e: /* MVI A,n */ m->accu = read_arg(m);                break;
+        case 0x3a: /* LDA adr */ m->accu = m->mem[read_arg(m)];        break;
+        case 0x32: /* STA adr */ m->mem[read_arg(m)] = m->accu;        break;
+        case 0x6f: /* MOV L,A */ m->reg_l = m->accu;                   break;
+        case 0x6e: /* MOV L,M */ m->reg_l = m->mem[m->reg_l];          break;
+        case 0x2e: /* MVI L,n */ m->reg_l = read_arg(m);               break;
+        case 0x31: /* LXI SP,n*/ m->sp = read_arg(m);                  break;
+        case 0xf5: /* PUSH A  */ --m->sp; m->mem[m->sp] = m->accu;     break;
+        case 0xe5: /* PUSH L  */ --m->sp; m->mem[m->sp] = m->reg_l;    break;
+        case 0xed: /* PUSH FL */ --m->sp; m->mem[m->sp] = m->flags;    break;
+        case 0xf1: /* POP A   */ m->accu  = m->mem[m->sp]; ++m->sp;    break;
+        case 0xe1: /* POP L   */ m->reg_l = m->mem[m->sp]; ++m->sp;    break;
+        case 0xfd: /* POP FL  */ m->flags = m->mem[m->sp]; ++m->sp;    break;
+        case 0xdb: /* IN adr  */ user_input(read_arg(m), m);           break;
+        case 0xd3: /* OUT adr */ user_output(read_arg(m), m);          break;
         /* ------ ARITHMETIC  ------ */
-        case 0x3c: /* INR A */ ++m->accu;                                break;
-        case 0x2c: /* INR L */ ++m->reg_l;                               break;
-        case 0x3d: /* DCR A */ --m->accu;                                break;
-        case 0x2d: /* DCR L */ --m->reg_l;                               break;
-        case 0x87: /* ADD A */ m->accu *= 2;                             break;
-        case 0x85: /* ADD L */ m->accu += m->reg_l;                      break;
-        case 0x86: /* ADD M */ m->accu += m->memory[m->reg_l];           break;
-        case 0xc6: /* ADI n */ m->accu += read_arg(m);                   break;
-        case 0x97: /* SUB A */ m->accu  = 0;                             break;
-        case 0x95: /* SUB L */ m->reg_l = 0;                             break;
-        case 0x96: /* SUB M */ m->accu -= m->memory[m->reg_l];           break;
-        case 0xd6: /* SUI n */ m->accu -= read_arg(m);                   break;
-        case 0xbf: /* CMP A */ set_flag(F_ZERO, m);                      break;
-        case 0xbd: /* CMP L */ compare(m->reg_l, m->accu, m);            break;
-        case 0xbe: /* CMP M */ compare(m->memory[m->reg_l], m->accu, m); break;
-        case 0xfe: /* CPI n */ compare(m->accu, read_arg(m), m);         break;
+        case 0x3c: /* INR A */ ++m->accu;                              break;
+        case 0x2c: /* INR L */ ++m->reg_l;                             break;
+        case 0x3d: /* DCR A */ --m->accu;                              break;
+        case 0x2d: /* DCR L */ --m->reg_l;                             break;
+        case 0x87: /* ADD A */ m->accu *= 2;                           break;
+        case 0x85: /* ADD L */ m->accu += m->reg_l;                    break;
+        case 0x86: /* ADD M */ m->accu += m->mem[m->reg_l];            break;
+        case 0xc6: /* ADI n */ m->accu += read_arg(m);                 break;
+        case 0x97: /* SUB A */ m->accu  = 0;                           break;
+        case 0x95: /* SUB L */ m->reg_l = 0;                           break;
+        case 0x96: /* SUB M */ m->accu -= m->mem[m->reg_l];            break;
+        case 0xd6: /* SUI n */ m->accu -= read_arg(m);                 break;
+        case 0xbf: /* CMP A */ set_flag(F_ZERO, m);                    break;
+        case 0xbd: /* CMP L */ compare(m->reg_l, m->accu, m);          break;
+        case 0xbe: /* CMP M */ compare(m->mem[m->reg_l], m->accu, m);  break;
+        case 0xfe: /* CPI n */ compare(m->accu, read_arg(m), m);       break;
         /* ----- LOGIC ----- */
-        case 0xa7: /* ANA A */ /* nothing to do */                       break;
-        case 0xa5: /* ANA L */ m->accu &= m->reg_l;                      break;
-        case 0xa6: /* ANA M */ m->accu &= m->memory[m->reg_l];           break;
-        case 0xe6: /* ANI n */ m->accu &= read_arg(m);                   break;
-        case 0xb7: /* ORA A */ /* nothing to do */                       break;
-        case 0xb5: /* ORA L */ m->accu |= m->reg_l;                      break;
-        case 0xb6: /* ORA M */ m->accu |= m->memory[m->reg_l];           break;
-        case 0xf6: /* ORI n */ m->accu |= read_arg(m);                   break;
-        case 0xaf: /* XRA A */ m->accu = 0;                              break;
-        case 0xad: /* XRA L */ m->accu ^= m->reg_l;                      break;
-        case 0xae: /* XRA M */ m->accu ^= m->memory[m->reg_l];           break;
-        case 0xee: /* XRI n */ m->accu ^= read_arg(m);                   break;
+        case 0xa7: /* ANA A */ /* nothing to do */                     break;
+        case 0xa5: /* ANA L */ m->accu &= m->reg_l;                    break;
+        case 0xa6: /* ANA M */ m->accu &= m->mem[m->reg_l];            break;
+        case 0xe6: /* ANI n */ m->accu &= read_arg(m);                 break;
+        case 0xb7: /* ORA A */ /* nothing to do */                     break;
+        case 0xb5: /* ORA L */ m->accu |= m->reg_l;                    break;
+        case 0xb6: /* ORA M */ m->accu |= m->mem[m->reg_l];            break;
+        case 0xf6: /* ORI n */ m->accu |= read_arg(m);                 break;
+        case 0xaf: /* XRA A */ m->accu = 0;                            break;
+        case 0xad: /* XRA L */ m->accu ^= m->reg_l;                    break;
+        case 0xae: /* XRA M */ m->accu ^= m->mem[m->reg_l];            break;
+        case 0xee: /* XRI n */ m->accu ^= read_arg(m);                 break;
         /* ----- BRANCH ----- */
-        case 0xc3: /* JMP adr */ m->pc = read_arg(m);                    break;
-        case 0xcd: /* CALL adr*/ call(read_arg(m), m);                   break;
-        case 0xca: /* JZ  adr */ con_jmp(read_arg(m), F_ZERO, m);        break;
-        case 0xcc: /* CZ  adr */ con_call(read_arg(m), F_ZERO, m);       break;
-        case 0xc4: /* CNZ adr */ con_no_call(read_arg(m), F_ZERO,  m);   break;
-        case 0xc2: /* JNZ adr */ con_no_jmp(read_arg(m), F_ZERO,  m);    break;
-        case 0xdc: /* CC  adr */ con_call(read_arg(m), F_CARRY, m);      break;
-        case 0xda: /* JC  adr */ con_jmp(read_arg(m), F_CARRY, m);       break;
-        case 0xd2: /* JNC adr */ con_no_jmp(read_arg(m), F_CARRY, m);    break;
-        case 0xd4: /* CNC adr */ con_no_call(read_arg(m), F_CARRY, m);   break;
-        case 0xc9: /* RET     */ m->pc = m->memory[m->sp]; ++m->sp;      break;
+        case 0xc3: /* JMP adr */ m->pc = read_arg(m);                  break;
+        case 0xcd: /* CALL adr*/ call(read_arg(m), m);                 break;
+        case 0xca: /* JZ  adr */ con_jmp(read_arg(m), F_ZERO, m);      break;
+        case 0xcc: /* CZ  adr */ con_call(read_arg(m), F_ZERO, m);     break;
+        case 0xc4: /* CNZ adr */ con_no_call(read_arg(m), F_ZERO,  m)  break;
+        case 0xc2: /* JNZ adr */ con_no_jmp(read_arg(m), F_ZERO,  m);  break;
+        case 0xdc: /* CC  adr */ con_call(read_arg(m), F_CARRY, m);    break;
+        case 0xda: /* JC  adr */ con_jmp(read_arg(m), F_CARRY, m);     break;
+        case 0xd2: /* JNC adr */ con_no_jmp(read_arg(m), F_CARRY, m);  break;
+        case 0xd4: /* CNC adr */ con_no_call(read_arg(m), F_CARRY, m); break;
+        case 0xc9: /* RET     */ m->pc = m->mem[m->sp]; ++m->sp;       break;
         /* ----- SPECIAL ----- */
-        case 0x76: /* HLT */ m->halted = TRUE;                           break;
-        case 0x00: /* NOP */                                             break;
-        case 0xfb: /* EI  */ m->interrupt_enabled = TRUE;                break;
-        case 0xf3: /* DI  */ m->interrupt_enabled = FALSE;               break;
+        case 0x76: /* HLT */ m->halted = TRUE;                         break;
+        case 0x00: /* NOP */                                           break;
+        case 0xfb: /* EI  */ m->int_active = TRUE;                     break;
+        case 0xf3: /* DI  */ m->int_active = FALSE;                    break;
     }
 }
 
@@ -253,7 +253,7 @@ int emulate(void)
 
     while (!machine.halted) {
 
-        next_ins = machine.memory[machine.pc];
+        next_ins = machine.mem[machine.pc];
         ++machine.pc;
         ++machine.step_count;
 

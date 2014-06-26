@@ -56,6 +56,10 @@ SP                  { yylval.ival = AT_REG_SP; return TOK_ARG; }
                         yylval.sval = strdup(yytext);
                         return TOK_TXT;
                     }
+(?i:{LETTER}):      {
+                        yylval.sval = strdup(yytext);
+                        return TOK_LABELDECL;
+                    }
 
 .|\n                {}
 

@@ -8,9 +8,9 @@ LEX=flex
 LFLAGS=
 
 vnsasm: vnsasm.c vnsasm.h scanner.c parser.tab.c \
-		../common/utils.c ../common/instructionset.c \
-		../common/utils.h ../common/globals.h \
-		../common/instructionset.h
+		../common/utils.c ../common/utils.h ../common/globals.h \
+		../common/instructionset.c ../common/instructionset.h \
+		../common/list.c ../common/list.h
 	$(CC) -o $@ $(filter %c, $^) $(CFLAGS) $(LIBS)
 
 scanner.c: scanner.l parser.tab.h

@@ -14,16 +14,15 @@ MVI L,102
 MOV M,A
 
 ; call multiply function
-CALL 50
+CALL mult
 OUT 0
 HLT
 
-.offset 50
 ; multiply
-MVI L,102
+mult: MVI L,102
 MOV A,M
 CPI 0
-JZ 110
+JZ end
 DCR A
 MOV M,A
 MVI L,100
@@ -32,10 +31,8 @@ MVI L,101
 ADD M
 MVI L,100
 MOV M,A
-JMP 50
-
-.offset 110
-; move result to accu and return
+JMP mult
+end:
 MVI L,100
 MOV A,M
 RET

@@ -21,6 +21,8 @@
 #include <stdint.h>
 
 #include "globals.h"
+#include "list.h"
+
 #include "instructionset.h"
 
 #define MEMORY_UNIT_SIZE 256
@@ -28,6 +30,7 @@
 typedef struct _vnsasm_program {
     uint8_t data[MEMORY_UNIT_SIZE];
     uint8_t counter;
+    list labels;
 } vnsasm_program;
 
 typedef struct _vnsasm_configuration {
@@ -35,13 +38,21 @@ typedef struct _vnsasm_configuration {
     char *infile_name;
     uint8_t verbose_mode;
     uint8_t strip_trailing_zeros;
+    uint8_t print_resolved_labels;
     vnsasm_program *program;
 } vnsasm_configuration;
+
+typedef struct _vnsasm_label {
+    char *name;
+    int addr;
+    list positions;
+} vnsasm_label;
 
 int yyparse(void);
 void yyerror(char *error);
 
-void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t iarg);
+void prc_label_declaration(char *name);
+void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s);
 void prc_offset(uint8_t offset);
 
 extern FILE *yyin;

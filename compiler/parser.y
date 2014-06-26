@@ -30,6 +30,7 @@ void yyerror(char*);
 %token <ival> TOK_INT;
 %token <ival> TOK_ARG;
 %token <sval> TOK_TXT;
+%token <sval> TOK_LABELDECL;
 
 %token TOK_SEP;
 %token TOK_OFFSET;
@@ -43,21 +44,24 @@ asnasmfile
 
 line
     : line instruction
+    | line TOK_LABELDECL { prc_label_declaration($2); } instruction
+    | TOK_LABELDECL      { prc_label_declaration($1); } instruction
     | instruction
     ;
 
 instruction
     : asm_command
-    | TOK_TXT TOK_ARG                 { prc_ins($1, $2, AT_NONE, 0);      }
-    | TOK_TXT TOK_INT                 { prc_ins($1, AT_INT, AT_NONE, $2); }
-    | TOK_TXT TOK_ARG TOK_SEP TOK_INT { prc_ins($1, $2, AT_INT, $4);      }
-    | TOK_TXT TOK_ARG TOK_SEP TOK_ARG { prc_ins($1, $2, $4, 0);           }
-    | TOK_TXT                         { prc_ins($1, AT_NONE, AT_NONE, 0); }
+    | TOK_TXT TOK_ARG           { prc_ins($1, $2, AT_NONE, 0, NULL);       }
+    | TOK_TXT TOK_INT           { prc_ins($1, AT_INT, AT_NONE, $2, NULL);  }
+    | TOK_TXT TOK_TXT           { prc_ins($1, AT_LABEL, AT_NONE, 0, $2);   }
+    | TOK_TXT TOK_ARG TOK_SEP TOK_INT { prc_ins($1, $2, AT_INT, $4, NULL); }
+    | TOK_TXT TOK_ARG TOK_SEP TOK_ARG { prc_ins($1, $2, $4, 0, NULL);      }
+    | TOK_TXT TOK_ARG TOK_SEP TOK_TXT { prc_ins($1, $2, AT_LABEL, 0, $4);  }
+    | TOK_TXT                   { prc_ins($1, AT_NONE, AT_NONE, 0, NULL);  }
     ;
 
 asm_command
-    : TOK_OFFSET TOK_INT              { prc_offset($2);                   }
+    : TOK_OFFSET TOK_INT        { prc_offset($2); }
     ;
 
 %%
-

@@ -18,8 +18,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
-#include "instructionset.h"
+#include <assert.h>
 
 #include "utils.h"
 #include "vnsasm.h"
@@ -32,7 +31,7 @@ void yyerror(char *error)
     exit(EXIT_FAILURE);
 }
 
-void write_program()
+void write_program(void)
 {
     uint8_t *start, *end;
     size_t size = MEMORY_UNIT_SIZE;
@@ -45,7 +44,9 @@ void write_program()
 
     if (config.strip_trailing_zeros && size) {
         start = (uint8_t*)config.program;
-        for (end = start + size - 1; *end == 0 && end != start; --end) --size;
+        for (end = start + size - 1; *end == 0 && end != start; --end) {
+            --size;
+        }
     }
 
     if (1 != fwrite((void*)config.program, size, 1, outfile)) {
@@ -56,13 +57,108 @@ void write_program()
     fclose(outfile);
 }
 
+void backpatch_labels(void)
+{
+    vnsasm_label *label;
+    list_item *pos, *item = config.program->labels.head;
+
+    while (NULL != item) {
+        label = (vnsasm_label*)item->payload;
+
+        if (-1 == label->addr) {
+            fprintf(stderr, "Could not resolve label: %s\n", label->name);
+            exit(EXIT_FAILURE);
+        }
+
+        if (config.print_resolved_labels) {
+            printf(" -> Label '%s' resolved to address 0x%.2x (%i)\n",
+                    label->name, label->addr, label->addr);
+        }
+
+        pos = label->positions.head;
+        while (NULL != pos) {
+            *((uint8_t*)pos->payload) = label->addr;
+            pos = pos->next;
+        }
+
+        item = item->next;
+    }
+}
+
+vnsasm_label *find_label(char *name)
+{
+    vnsasm_label *label;
+    list_item *item = config.program->labels.head;
+
+    while (NULL != item) {
+        label = (vnsasm_label*)item->payload;
+        if (0 == strcmp(label->name, name)) {
+            return label;
+        }
+        item = item->next;
+    }
+
+    return NULL;
+}
+
+vnsasm_label* declare_label(char *name, unsigned int addr)
+{
+    vnsasm_label *label;
+
+    if (NULL != (label = find_label(name))) {
+        /* label exists */
+        if ((-1 != addr) && (-1 == label->addr)) {
+            /* label has not been declared yet */
+            label->addr = addr;
+        } else {
+            fprintf(stderr,
+                    "Duplicated label declaration near line %i: %s\n",
+                    yylineno, name);
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        label = (vnsasm_label*)malloc(sizeof(vnsasm_label));
+
+        label->name = strdup(name);
+        label->addr = addr;
+        list_init(&label->positions);
+
+        list_insert(&config.program->labels, NULL, label, free);
+    }
+
+    return label;
+}
+
+void push_label_mark(char *name)
+{
+    vnsasm_label *label;
+
+    if (NULL == (label = find_label(name))) {
+        /* store label, that is not defined yet but mark it "pending" */
+        label = declare_label(name, -1);
+    }
+
+    uint8_t *pos = &config.program->data[config.program->counter];
+    list_insert(&label->positions, NULL, (void*)pos, NULL);
+}
+
 void push_byte(uint8_t byte)
 {
     config.program->data[config.program->counter] = byte;
     ++(config.program->counter);
 }
 
-void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t iarg)
+void prc_label_declaration(char *name)
+{
+    /* strip trailing colon */
+    char *colon = rindex(name, ':');
+    assert(colon != NULL);
+    *colon = '\0';
+
+    declare_label(name, config.program->counter);
+}
+
+void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
 {
     vns_instruction *ins = is_find_mnemonic(mnemonic, at1, at2);
 
@@ -75,8 +171,12 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t iarg)
 
     push_byte(ins->opcode);
 
+    if (NULL != s && ((ins->at1 & AT_LABEL) || (ins->at2 & AT_LABEL))) {
+        push_label_mark(s);
+    }
+
     if ((ins->at1 & AT_INT) || (ins->at2 & AT_INT)) {
-        push_byte(iarg);
+        push_byte(i);
     }
 }
 
@@ -96,12 +196,17 @@ int compile(void)
             util_basename(config.infile_name),
             util_basename(config.outfile_name));
 
+    list_init(&config.program->labels);
+
     if (0 != yyparse()) {
         return EXIT_FAILURE;
     }
 
-    fclose(yyin);
+    backpatch_labels();
     write_program();
+
+    list_destroy(&config.program->labels);
+    fclose(yyin);
 
     return EXIT_SUCCESS;
 }
@@ -113,6 +218,7 @@ void print_usage(char *pname)
     printf("  -v             Turn on verbose output.\n");
     printf("  -o <outfile>   Write compiled program to <outfile>.\n");
     printf("  -z             Do NOT strip trailing zeros.\n");
+    printf("  -r             Print resolved label addresses.\n");
     printf("\n");
 }
 
@@ -133,10 +239,11 @@ int main(int argc, char **argv)
     config.infile_name = NULL;
     config.verbose_mode = FALSE;
     config.strip_trailing_zeros = TRUE;
+    config.print_resolved_labels = FALSE;
     config.program = &program;
 
     /* parse cmdline arguments */
-    while ((opt = getopt(argc, argv, "ho:vz")) != -1) {
+    while ((opt = getopt(argc, argv, "ho:vzr")) != -1) {
         switch(opt) {
             case 'h':
                 print_usage(process_name);
@@ -149,6 +256,9 @@ int main(int argc, char **argv)
                 break;
             case 'z':
                 config.strip_trailing_zeros = FALSE;
+                break;
+            case 'r':
+                config.print_resolved_labels = TRUE;
                 break;
             default:
                 print_usage(process_name);

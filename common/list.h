@@ -14,31 +14,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef INSTRUCTIONSET_H
-#define INSTRUCTIONSET_H 1
+#ifndef LIST_H
+#define LIST_H 1
 
-#include <stdint.h>
+typedef void free_function(void *);
 
-typedef uint8_t argtype;
+typedef struct _list_item {
+    struct _list_item *next;
+    struct _list_item *prev;
+    void *payload;
+    free_function *free_func;
+} list_item;
 
-#define AT_NONE     0x00
-#define AT_INT      0x01
-#define AT_ADDR     0x03    // sets AT_INT bit too
-#define AT_REG_A    0x04
-#define AT_REG_L    0x08
-#define AT_REG_FL   0x10
-#define AT_REG_SP   0x20
-#define AT_MEM      0x40
-#define AT_LABEL    0x83    // set AT_INT, AT_ADDR too 
+typedef struct _list {
+    list_item *head;
+    unsigned int length;
+} list;
 
-typedef struct _vns_instruction {
-    char *mnemonic;
-    argtype at1;
-    argtype at2;
-    uint8_t opcode;
-} vns_instruction;
+void list_init(list *l);
+void list_destroy(list *l);
+void list_insert(list *l, list_item *at, void *payload, free_function *f);
+void list_remove(list *l, list_item *item);
 
-vns_instruction *is_find_mnemonic(char *mnemonic, argtype at1, argtype at2);
-vns_instruction *is_find_opcode(uint8_t opcode);
-
-#endif /* INSTRUCTIONSET_H */
+#endif /* LIST_H */

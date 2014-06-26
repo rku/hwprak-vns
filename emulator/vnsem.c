@@ -312,7 +312,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if(optind > argc) {
+    if(optind >= argc) {
         print_usage(process_name);
         return EXIT_SUCCESS;
     }

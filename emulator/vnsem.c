@@ -163,7 +163,7 @@ void user_input(uint8_t port, vnsem_machine *machine)
             break;
         }
 
-        fprintf(stderr, "Bad input. Expected byte in hex/decimal notation.\n");
+        fprintf(stderr, "Bad input. Expected byte in hex/dec notation.\n");
     }
 
     machine->accu = value;

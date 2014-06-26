@@ -160,9 +160,18 @@ void user_output(uint8_t port, vnsem_machine *machine)
 void user_input(uint8_t port, vnsem_machine *machine)
 {
     short int value;
+    char prompt[32], *input = NULL;
 
-    while (1 != sscanf(readline("PROGRAM INPUT> "), "%hd", &value)) {
-        printf("Invalid input!\n");
+    snprintf((char*)&prompt, 32, "PROGRAM INPUT (Port %.2x)> ", port);
+
+    while (1) {
+        input = readline(prompt);
+
+        if (NULL != input && 1 == sscanf(input, "%hd", &value)) {
+            break;
+        }
+
+        fprintf(stderr, "Bad input. Expected byte in hex/decimal notation.\n");
     }
 
     machine->accu = value;

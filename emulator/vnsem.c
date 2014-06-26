@@ -50,19 +50,6 @@ void print_key(void)
     printf("\n");
 }
 
-void dump_mem(vnsem_machine *machine)
-{
-    unsigned int i;
-
-    printf("\n");
-    for (i = 0; i < sizeof(machine->mem); ++i) {
-        printf("%.2x ", machine->mem[i]);
-        if (0 == ((i+1) % 8)) {
-            printf("\n");
-        }
-    }
-}
-
 void reset_machine(vnsem_machine *machine)
 {
     /* set everything to zero */
@@ -84,8 +71,6 @@ void load_program(vnsem_machine *machine)
     while (1 == fread((void*)&instruction, 1, 1, config.infile_d)) {
         machine->mem[addr++] = instruction;
     }
-
-    //dump_mem(machine);
 
     fclose(config.infile_d);
 

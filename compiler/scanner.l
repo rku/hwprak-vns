@@ -17,14 +17,13 @@
 %{
 #include <stdlib.h>
 #include <stdint.h>
-#include "grammar.tab.h"
+#include "parser.tab.h"
 #include "instructionset.h"
 %}
 
 %option nounput
 %option noinput
 %option yylineno
-%option outfile="lexer.c"
 
 DECNUM              [0-9]+
 HEXNUM              0[xX][[:xdigit:]]+

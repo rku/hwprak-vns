@@ -7,18 +7,19 @@ BFLAGS=-d
 LEX=flex
 LFLAGS=
 
-vnsasm: vnsasm.c vnsasm.h lexer.c grammar.tab.c \
+vnsasm: vnsasm.c vnsasm.h scanner.c parser.tab.c \
 		../common/utils.c ../common/instructionset.c \
-		../common/utils.h ../common/globals.h ../common/instructionset.h
+		../common/utils.h ../common/globals.h \
+		../common/instructionset.h
 	$(CC) -o $@ $(filter %c, $^) $(CFLAGS) $(LIBS)
 
-lexer.c: lexer.l grammar.tab.h
+scanner.c: scanner.l parser.tab.h
 	$(LEX) -o $@ $< $(FLEXARGS)
 
-grammar.tab.h: grammar.y
+parser.tab.h: parser.y
 	$(BISON) $(BFLAGS) $<
 
-grammar.tab.c: grammar.tab.h
+parser.tab.c: parser.tab.h
 
 clean:
-	@rm -f *.o lexer.c grammar.tab.* grammar.dot vnsasm
+	@rm -f *.o scanner.c parser.tab.* parser.dot vnsasm

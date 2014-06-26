@@ -18,5 +18,6 @@
 #define UTILS_H 1
 
 char *util_basename(char *path);
+void util_str_toupper(char *str);
 
 #endif /* UTILS_H */

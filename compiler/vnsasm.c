@@ -155,12 +155,16 @@ void prc_label_declaration(char *name)
     assert(colon != NULL);
     *colon = '\0';
 
+    util_str_toupper(name);
     declare_label(name, config.program->counter);
 }
 
 void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
 {
-    vns_instruction *ins = is_find_mnemonic(mnemonic, at1, at2);
+    vns_instruction *ins;
+    
+    util_str_toupper(mnemonic);
+    ins = is_find_mnemonic(mnemonic, at1, at2);
 
     if (NULL == ins) {
         fprintf(stderr, "Error near line %i: ", yylineno);
@@ -172,6 +176,7 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
     push_byte(ins->opcode);
 
     if (NULL != s && ((ins->at1 & AT_LABEL) || (ins->at2 & AT_LABEL))) {
+        util_str_toupper(s);
         push_label_mark(s);
     }
 

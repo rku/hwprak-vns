@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "utils.h"
 
@@ -28,4 +29,14 @@ char *util_basename(char *path)
     }
 
     return path;
+}
+
+void util_str_toupper(char *str)
+{
+    char *p = str;
+
+    while (*p) {
+        *p = toupper(*p);
+        p++;
+    }
 }

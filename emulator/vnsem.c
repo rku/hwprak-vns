@@ -234,7 +234,7 @@ void process_instruction(uint8_t ins, vnsem_machine *m)
         case 0xcd: /* CALL adr*/ call(read_arg(m), m);                 break;
         case 0xca: /* JZ  adr */ con_jmp(read_arg(m), F_ZERO, m);      break;
         case 0xcc: /* CZ  adr */ con_call(read_arg(m), F_ZERO, m);     break;
-        case 0xc4: /* CNZ adr */ con_no_call(read_arg(m), F_ZERO,  m)  break;
+        case 0xc4: /* CNZ adr */ con_no_call(read_arg(m), F_ZERO,  m); break;
         case 0xc2: /* JNZ adr */ con_no_jmp(read_arg(m), F_ZERO,  m);  break;
         case 0xdc: /* CC  adr */ con_call(read_arg(m), F_CARRY, m);    break;
         case 0xda: /* JC  adr */ con_jmp(read_arg(m), F_CARRY, m);     break;

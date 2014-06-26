@@ -23,7 +23,7 @@ char *util_basename(char *path)
 {
     char *basename;
 
-    if(NULL != (basename = rindex(path, '/'))) {
+    if (NULL != (basename = rindex(path, '/'))) {
         return basename + 1;
     }
 

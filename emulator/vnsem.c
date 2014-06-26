@@ -54,9 +54,9 @@ void dump_memory(vnsem_machine *machine)
     unsigned int i;
 
     printf("\n");
-    for(i = 0; i < sizeof(machine->memory); ++i) {
+    for (i = 0; i < sizeof(machine->memory); ++i) {
         printf("%.2x ", machine->memory[i]);
-        if(0 == ((i+1) % 8)) {
+        if (0 == ((i+1) % 8)) {
             printf("\n");
         }
     }
@@ -73,14 +73,14 @@ void load_program(vnsem_machine *machine)
     uint8_t instruction = 0, addr = 0;
 
     /* load the program */
-    if(NULL == (config.infile_d = fopen(config.infile_name, "r"))) {
+    if (NULL == (config.infile_d = fopen(config.infile_name, "r"))) {
         perror(config.infile_name);
         exit(EXIT_FAILURE);
     }
 
     printf("Loading program...");
 
-    while(1 == fread((void*)&instruction, 1, 1, config.infile_d)) {
+    while (1 == fread((void*)&instruction, 1, 1, config.infile_d)) {
         machine->memory[addr++] = instruction;
     }
 
@@ -98,7 +98,7 @@ void set_flag(uint8_t flag, vnsem_machine *machine)
 
 void unset_flag(uint8_t flag, vnsem_machine *machine)
 {
-    if(machine->flags & flag) {
+    if (machine->flags & flag) {
         machine->flags ^= flag;
     }
 }
@@ -117,35 +117,35 @@ void call(uint8_t addr, vnsem_machine *machine)
 
 void con_call(uint8_t addr, uint8_t flag, vnsem_machine *machine)
 {
-    if(machine->flags & flag) {
+    if (machine->flags & flag) {
         call(addr, machine);
     }
 }
 
 void con_no_call(uint8_t addr, uint8_t flag, vnsem_machine *machine)
 {
-    if(!(machine->flags & flag)) {
+    if (!(machine->flags & flag)) {
         call(addr, machine);
     }
 }
 
 void con_jmp(uint8_t addr, uint8_t flag, vnsem_machine *machine)
 {
-    if(machine->flags & flag) {
+    if (machine->flags & flag) {
         machine->pc = addr;
     }
 }
 
 void con_no_jmp(uint8_t addr, uint8_t flag, vnsem_machine *machine)
 {
-    if(!(machine->flags & flag)) {
+    if (!(machine->flags & flag)) {
         machine->pc = addr;
     }
 }
 
 void compare(uint8_t a, uint8_t b, vnsem_machine *machine)
 {
-    if(a == b) {
+    if (a == b) {
         set_flag(F_ZERO, machine);
     } else {
         unset_flag(F_ZERO, machine);
@@ -161,7 +161,7 @@ void user_input(uint8_t port, vnsem_machine *machine)
 {
     short int value;
 
-    while(1 != sscanf(readline("PROGRAM INPUT> "), "%hd", &value)) {
+    while (1 != sscanf(readline("PROGRAM INPUT> "), "%hd", &value)) {
         printf("Invalid input!\n");
     }
 
@@ -251,7 +251,7 @@ int emulate(void)
 
     print_key();
 
-    while(!machine.halted) {
+    while (!machine.halted) {
 
         next_ins = machine.memory[machine.pc];
         ++machine.pc;
@@ -292,7 +292,7 @@ int main(int argc, char **argv)
     config.step_time_ms = 20;
     config.infile_name = NULL;
 
-    while(-1 != (opt = getopt(argc, argv, "hvis:"))) {
+    while (-1 != (opt = getopt(argc, argv, "hvis:"))) {
         switch(opt) {
             case 'h':
                 print_usage(process_name);
@@ -312,7 +312,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if(optind >= argc) {
+    if (optind >= argc) {
         print_usage(process_name);
         return EXIT_SUCCESS;
     }

@@ -102,15 +102,15 @@ int inscmp(const void *key, const void *other)
     vns_instruction *key_ins = (vns_instruction*)key;
     vns_instruction *other_ins = (vns_instruction*)other;
 
-    if(0 != (cmp = strcmp(key_ins->mnemonic, other_ins->mnemonic))) {
+    if (0 != (cmp = strcmp(key_ins->mnemonic, other_ins->mnemonic))) {
         return cmp;
     }
 
-    if(!(key_ins->at1 & other_ins->at1)) {
+    if (!(key_ins->at1 & other_ins->at1)) {
         return (key_ins->at1 - other_ins->at1);
     }
 
-    if(!(key_ins->at2 & other_ins->at2)) {
+    if (!(key_ins->at2 & other_ins->at2)) {
         return (key_ins->at2 - other_ins->at2);
     }
 
@@ -160,9 +160,9 @@ vns_instruction *is_find_opcode(uint8_t opcode)
     ins_size = sizeof(vns_instruction);
     n = sizeof(vns_instructionset) / ins_size;
 
-    for(i = 0; i < n; ++i) {
+    for (i = 0; i < n; ++i) {
         result = &vns_instructionset[i];
-        if(result->opcode == opcode) {
+        if (result->opcode == opcode) {
             return result;
         }
     }

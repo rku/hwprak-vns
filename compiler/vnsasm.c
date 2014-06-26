@@ -38,17 +38,17 @@ void write_program()
     size_t size = MEMORY_UNIT_SIZE;
     FILE *outfile = fopen(config.outfile_name, "w+");
 
-    if(NULL == outfile) {
+    if (NULL == outfile) {
         perror(config.outfile_name);
         exit(EXIT_FAILURE);
     }
 
-    if(config.strip_trailing_zeros && size) {
+    if (config.strip_trailing_zeros && size) {
         start = (uint8_t*)config.program;
-        for(end = start + size - 1; *end == 0 && end != start; --end) --size;
+        for (end = start + size - 1; *end == 0 && end != start; --end) --size;
     }
 
-    if(1 != fwrite((void*)config.program, size, 1, outfile)) {
+    if (1 != fwrite((void*)config.program, size, 1, outfile)) {
         perror(config.outfile_name);
         exit(EXIT_FAILURE);
     }
@@ -66,7 +66,7 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t iarg)
 {
     vns_instruction *ins = is_find_mnemonic(mnemonic, at1, at2);
 
-    if(NULL == ins) {
+    if (NULL == ins) {
         fprintf(stderr, "Error near line %i: ", yylineno);
         fprintf(stderr, "Unknown instruction '%s' or ", mnemonic);
         fprintf(stderr, "invalid argument types!");
@@ -75,7 +75,7 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t iarg)
 
     push_byte(ins->opcode);
 
-    if((ins->at1 & AT_INT) || (ins->at2 & AT_INT)) {
+    if ((ins->at1 & AT_INT) || (ins->at2 & AT_INT)) {
         push_byte(iarg);
     }
 }
@@ -87,7 +87,7 @@ void prc_offset(uint8_t offset)
 
 int compile(void)
 {
-    if(NULL == (yyin = fopen(config.infile_name, "r"))) {
+    if (NULL == (yyin = fopen(config.infile_name, "r"))) {
         perror(config.infile_name);
         return EXIT_FAILURE;
     }
@@ -96,7 +96,7 @@ int compile(void)
             util_basename(config.infile_name),
             util_basename(config.outfile_name));
 
-    if(0 != yyparse()) {
+    if (0 != yyparse()) {
         return EXIT_FAILURE;
     }
 
@@ -136,7 +136,7 @@ int main(int argc, char **argv)
     config.program = &program;
 
     /* parse cmdline arguments */
-    while((opt = getopt(argc, argv, "ho:vz")) != -1) {
+    while ((opt = getopt(argc, argv, "ho:vz")) != -1) {
         switch(opt) {
             case 'h':
                 print_usage(process_name);
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if(optind >= argc) {
+    if (optind >= argc) {
         print_usage(process_name);
         return EXIT_SUCCESS;
     }

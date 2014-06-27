@@ -262,6 +262,11 @@ void process_instruction(uint8_t ins, vnsem_machine *m)
         case 0x00: /* NOP */                                           break;
         case 0xfb: /* EI  */ m->int_active = TRUE;                     break;
         case 0xf3: /* DI  */ m->int_active = FALSE;                    break;
+        default:
+            fprintf(stderr,
+                    "\nError: Unknown instruction 0x%.2x at address 0x%.2x.\n",
+                    ins, m->pc - 1);
+            exit(EXIT_FAILURE);
     }
 }
 

@@ -79,7 +79,8 @@ void load_program(vnsem_machine *machine)
 
 void handle_interrupt(int signal)
 {
-    printf("\nInterrupt received.\n");
+    printf("\nInterrupt received. ");
+    printf("(Interrupt handling not yet implemented.)\n");
     exit(EXIT_SUCCESS);
 }
 

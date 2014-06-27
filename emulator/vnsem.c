@@ -160,8 +160,9 @@ void compare(uint8_t other, vnsem_machine *machine)
 
 void accu_op(int16_t result, vnsem_machine *machine)
 {
+    uint8_t value = (result & 0xff);
     update_flags_for_value(result, machine);
-    machine->accu = (result & 0xff) ? -1 * (result & 0xff) : (result & 0xff);
+    machine->accu = (value < 0) ? -value : value;
 }
 
 void user_output(uint8_t port, vnsem_machine *machine)

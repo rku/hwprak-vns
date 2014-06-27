@@ -50,6 +50,17 @@ void print_key(void)
     printf("\n");
 }
 
+void dump_memory(vnsem_machine *machine)
+{
+    int i;
+    printf("\n 0x00   ");
+    for (i = 0; i < 256; ++i) {
+        if (i > 0 && !(i % 8)) printf("\n 0x%.2x   ", i);
+        printf("%.2x ", machine->mem[i]);
+    }
+    printf("\n\n");
+}
+
 void reset_machine(vnsem_machine *machine)
 {
     /* set everything to zero */
@@ -268,6 +279,9 @@ int emulate(void)
 
         if (machine.halted) {
             printf("Machine halted.\n");
+            if (config.dump_mem_on_halt) {
+                dump_memory(&machine);
+            }
             while (machine.halted);
         }
     }
@@ -282,23 +296,25 @@ void print_usage(char *pname)
     printf("  -v         Turn on verbose output.\n");
     printf("  -i         Turn on interactive mode.\n");
     printf("  -s <ms>    Set step time to <ms> milliseconds.\n");
+    printf("  -d         Dump memory when machine is halted.\n");
     printf("\n");
 }
 
 int main(int argc, char **argv)
 {
     unsigned int opt;
-    char *process_name = util_basename(argv[0]);
+    char *p, *process_name = util_basename(argv[0]);
 
     printf(BANNER_LINE1, "Emulator");
     printf(BANNER_LINE2, VERSION);
 
     config.interactive_mode = FALSE;
     config.verbose_mode = FALSE;
-    config.step_time_ms = 20;
+    config.step_time_ms = 0;
     config.infile_name = NULL;
+    config.dump_mem_on_halt = FALSE;
 
-    while (-1 != (opt = getopt(argc, argv, "hvis:"))) {
+    while (-1 != (opt = getopt(argc, argv, "hvis:d"))) {
         switch(opt) {
             case 'h':
                 print_usage(process_name);
@@ -307,10 +323,17 @@ int main(int argc, char **argv)
                 config.verbose_mode = TRUE;
                 break;
             case 's':
-                config.step_time_ms = atoi(optarg);
+                config.step_time_ms = strtol(optarg, &p, 10);
+                if (!optarg || *p) {
+                    fprintf(stderr, "Invalid step time argument. %s\n", p);
+                    exit(EXIT_FAILURE);
+                }
                 break;
             case 'i':
                 config.interactive_mode = TRUE;
+                break;
+            case 'd':
+                config.dump_mem_on_halt = TRUE;
                 break;
             default:
                 print_usage(process_name);

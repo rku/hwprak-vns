@@ -24,6 +24,7 @@ typedef struct _vnsem_configuration {
     uint8_t interactive_mode;
     uint8_t verbose_mode;
     uint16_t step_time_ms;
+    uint8_t dump_mem_on_halt;
     char *infile_name;
     FILE *infile_d;
 } vnsem_configuration;

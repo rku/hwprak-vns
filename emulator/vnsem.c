@@ -325,7 +325,7 @@ int main(int argc, char **argv)
             case 's':
                 config.step_time_ms = strtol(optarg, &p, 10);
                 if (!optarg || *p) {
-                    fprintf(stderr, "Invalid step time argument. %s\n", p);
+                    fprintf(stderr, "Invalid step time argument.\n");
                     exit(EXIT_FAILURE);
                 }
                 break;

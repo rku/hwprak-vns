@@ -1,8 +1,10 @@
+JMP 0x10        ; as required by the exercise
 
 ; ***                                     ***
 ; *** the program from the first exercise ***
 ; ***                                     ***
 
+.offset 0x10    ; as required by the exercise
 MVI L, 0x1f     ; set L to 0x1f
 MVI A, 0x76     ; set accu to 0x76
 MOV M, A        ; move accu to mem addr L

@@ -167,24 +167,27 @@ void accu_op(int16_t result, vnsem_machine *machine)
 
 void user_output(uint8_t port, vnsem_machine *machine)
 {
-    printf("PROGRAM OUTPUT> 0x%x (%i)\n", machine->accu, machine->accu);
+    printf("[%.2x] Program output => 0x%x (%i)\n",
+            port, machine->accu, machine->accu);
 }
 
 void user_input(uint8_t port, vnsem_machine *machine)
 {
     short int value;
-    char prompt[32], *input = NULL;
+    char prompt[32], *input;
 
-    snprintf((char*)&prompt, 32, "PROGRAM INPUT (Port %.2x)> ", port);
+    snprintf((char*)&prompt, 32, "[%.2x] Program input => ", port);
 
     while (1) {
         input = readline(prompt);
 
         if (NULL != input && 1 == sscanf(input, "%hd", &value)) {
+            free(input);
             break;
         }
 
         fprintf(stderr, "Bad input. Expected byte in hex/dec notation.\n");
+        free(input);
     }
 
     machine->accu = value;

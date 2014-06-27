@@ -16,13 +16,22 @@ Example usage:
   vnsem multiply.bin
 
 
-Assembler features:
+Notes on the assembler:
 
 The assembler is case insensitive.
 
-.offset <offset>
+* IN <port>
+
+  Requests input for port <port> from user and stores it
+  in the accumulator.
+
+* OUT <port>
+
+  Prints content of accumulator to stdout.
+
+* .offset <offset>
   
-Set address offset for the following code to <offset>.
+  Sets address offset for the following code to <offset>.
 
   Example:
 
@@ -31,9 +40,9 @@ Set address offset for the following code to <offset>.
      HLT                ; halt
 
 
-<label>:
+* <label>:
   
-Declare a label.
+  Declares a label.
 
   Example:
 
@@ -43,3 +52,4 @@ Declare a label.
      foo: CALL foo2     ; declare label 'foo' and jump to
                         ; address labeled 'foo2'
      HLT                ; halt
+

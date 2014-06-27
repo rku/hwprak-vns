@@ -9,7 +9,37 @@ In order to build the compiler and emulator, just type:
 
   make
 
+
 Example usage:
 
   vnsasm -o multiply.bin examples/multiply.asm
   vnsem multiply.bin
+
+
+Assembler features:
+
+The assembler is case insensitive.
+
+.offset <offset>
+  
+Set address offset for the following code to <offset>.
+
+  Example:
+
+     JMP 0x10           ; jump to address 0x10
+     .offset 0x10       ; set code offset to 0x10
+     HLT                ; halt
+
+
+<label>:
+  
+Declare a label.
+
+  Example:
+
+     JMP foo            ; jump to address labeled 'fooÄ
+     foo2:              ; declare label 'foo2'
+     RET                ; return
+     foo: CALL foo2     ; declare label 'foo' and jump to
+                        ; address labeled 'foo2'
+     HLT                ; halt

@@ -1,6 +1,6 @@
 *.bin
-compiler/grammar.tab.*
-compiler/lexer.c
+compiler/parser.tab.*
+compiler/scanner.c
 compiler/vnsasm
 emulator/vnsem
 .*.swp

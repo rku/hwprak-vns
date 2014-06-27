@@ -13,7 +13,7 @@ In order to build the compiler and emulator, just type:
 Example usage:
 
   vnsasm -o multiply.bin examples/multiply.asm
-  vnsem multiply.bin
+  vnsem -s 10 multiply.bin
 
 
 Notes on the assembler:

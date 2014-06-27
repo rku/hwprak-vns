@@ -2,5 +2,4 @@ Things to do (list is not intended to be complete):
 
  * handle malloc errors
  * clean-up/improve emulator output
- * implement proper carry and sign bit handling
  * make parser reentrant

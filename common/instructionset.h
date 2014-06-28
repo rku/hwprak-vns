@@ -38,6 +38,7 @@ typedef struct _vns_instruction {
     uint8_t opcode;
 } vns_instruction;
 
+vns_instruction *is_lookup_mnemonic(char *str);
 vns_instruction *is_find_mnemonic(char *mnemonic, argtype at1, argtype at2);
 vns_instruction *is_find_opcode(uint8_t opcode);
 

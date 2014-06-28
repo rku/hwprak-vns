@@ -27,7 +27,9 @@
 
 DECNUM              [0-9]+
 HEXNUM              0[xX][[:xdigit:]]+
-LETTER              [A-Z]+
+SINGLE              [,:]
+COMMENT             ;.*\n
+TEXT                [A-Z][A-Z0-9_]+
 
 %%
 
@@ -40,11 +42,9 @@ LETTER              [A-Z]+
                         return TOK_INT;
                     }
 
-;.*\n               {  /* comment */     }
-
-\.(?i:offset)       { return TOK_OFFSET; }
-
-,                   { return TOK_SEP;    }
+{SINGLE}            { return yytext[0];   }
+{COMMENT}           { return TOK_NEWL;    }
+\.(?i:offset)       { return TOK_OFFSET;  }
 
 A                   { yylval.ival = AT_REG_A;  return TOK_ARG; }
 L                   { yylval.ival = AT_REG_L;  return TOK_ARG; }
@@ -52,15 +52,15 @@ M                   { yylval.ival = AT_MEM;    return TOK_ARG; }
 FL                  { yylval.ival = AT_REG_FL; return TOK_ARG; }
 SP                  { yylval.ival = AT_REG_SP; return TOK_ARG; }
 
-(?i:{LETTER})       {
+(?i:{TEXT})         {
                         yylval.sval = strdup(yytext);
-                        return TOK_TXT;
-                    }
-(?i:{LETTER}):      {
-                        yylval.sval = strdup(yytext);
-                        return TOK_LABELDECL;
+                        if (NULL != is_lookup_mnemonic(yylval.sval)) {
+                            return TOK_INS;
+                        }
+                        return TOK_ID;
                     }
 
-.|\n                {}
+\n                  { return TOK_NEWL;       }
+[ \s\t\r\f]+        { /* skip whitespaces */ }
 
 %%

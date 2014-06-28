@@ -148,13 +148,8 @@ void push_byte(uint8_t byte)
     ++(config.program->counter);
 }
 
-void prc_label_declaration(char *name)
+void prc_label_decl(char *name)
 {
-    /* strip trailing colon */
-    char *colon = rindex(name, ':');
-    assert(colon != NULL);
-    *colon = '\0';
-
     util_str_toupper(name);
     declare_label(name, config.program->counter);
 }

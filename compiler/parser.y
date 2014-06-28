@@ -38,7 +38,7 @@ void yyerror(char*);
 %%
 
 asnasmfile
-     : %empty
+     :
      | asnasmfile line
      ;
 

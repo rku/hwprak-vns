@@ -25,6 +25,8 @@
 #include "utils.h"
 #include "vnsem.h"
 
+#define ERR_ILLEGAL_INSTRUCTION (1)
+
 vnsem_configuration config;
 
 void print_machine_state(vnsem_machine *machine)
@@ -193,7 +195,7 @@ void user_input(uint8_t port, vnsem_machine *machine)
     machine->accu = value;
 }
 
-void process_instruction(uint8_t ins, vnsem_machine *m)
+int process_instruction(uint8_t ins, vnsem_machine *m)
 {
     switch (ins) {
         /* ----- TRANSFER ----- */
@@ -263,11 +265,9 @@ void process_instruction(uint8_t ins, vnsem_machine *m)
         case 0xfb: /* EI  */ m->int_active = TRUE;                     break;
         case 0xf3: /* DI  */ m->int_active = FALSE;                    break;
         default:
-            fprintf(stderr,
-                    "\nError: Unknown instruction 0x%.2x at address 0x%.2x.\n",
-                    ins, m->pc - 1);
-            exit(EXIT_FAILURE);
+            return ERR_ILLEGAL_INSTRUCTION;
     }
+    return 0;
 }
 
 int emulate(void)
@@ -288,7 +288,28 @@ int emulate(void)
         ++machine.pc;
         ++machine.step_count;
 
-        process_instruction(next_ins, &machine);
+        switch (process_instruction(next_ins, &machine))
+        {
+        case 0:
+        {
+            break;
+        }
+        case ERR_ILLEGAL_INSTRUCTION:
+        {
+            fprintf(stderr,
+                    "\nError: Unknown instruction 0x%.2x at address 0x%.2x.\n",
+                    next_ins, machine.pc - 1);
+            dump_memory(&machine);
+            exit(EXIT_FAILURE);
+            break;
+        }
+        default:
+            fprintf(stderr,
+                    "\nError: Could not execute instruction 0x%.2x at address 0x%.2x for unknown reason.\n",
+                    next_ins, machine.pc - 1);
+            dump_memory(&machine);
+            exit(EXIT_FAILURE);
+        }
 
         print_machine_state(&machine);
 

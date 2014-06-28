@@ -63,7 +63,7 @@ instruction
     ;
 
 asm_command
-    : TOK_OFFSET TOK_INT    { prc_offset($2); }
+    : TOK_OFFSET TOK_INT     { prc_offset($2); }
     ;
 
 %%

@@ -1,4 +1,4 @@
-.PONY: vnsasm vnsem all
+.PHONY: vnsasm vnsem all
 
 all: vnsasm vnsem
 

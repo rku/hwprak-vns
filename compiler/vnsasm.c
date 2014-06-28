@@ -192,7 +192,7 @@ int compile(void)
         return EXIT_FAILURE;
     }
 
-    fprintf(stdout, "Compiling %s into %s...\n",
+    printf("Compiling %s into %s...\n", 
             util_basename(config.infile_name),
             util_basename(config.outfile_name));
 
@@ -207,6 +207,8 @@ int compile(void)
 
     list_destroy(&config.program->labels);
     fclose(yyin);
+
+    printf("Finished.\n");
 
     return EXIT_SUCCESS;
 }

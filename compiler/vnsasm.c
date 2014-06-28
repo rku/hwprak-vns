@@ -169,7 +169,7 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
     if (NULL == ins) {
         fprintf(stderr, "Error near line %i: ", yylineno);
         fprintf(stderr, "Unknown instruction '%s' or ", mnemonic);
-        fprintf(stderr, "invalid argument types!");
+        fprintf(stderr, "invalid argument types!\n");
         exit(EXIT_FAILURE);
     }
 

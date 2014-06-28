@@ -23,6 +23,7 @@
 
 %option nounput
 %option noinput
+%option nodefault
 %option yylineno
 
 DECNUM              [0-9]+
@@ -30,6 +31,7 @@ HEXNUM              0[xX][[:xdigit:]]+
 SINGLE              [,:]
 COMMENT             ;.*\n
 TEXT                [A-Z][A-Z0-9_]+
+WHITESPACE          [ \s\t\r\f]
 
 %%
 
@@ -61,6 +63,6 @@ SP                  { yylval.ival = AT_REG_SP; return TOK_ARG; }
                     }
 
 \n                  { return TOK_NEWL;       }
-[ \s\t\r\f]+        { /* skip whitespaces */ }
+{WHITESPACE}+       { /* skip whitespaces */ }
 
 %%

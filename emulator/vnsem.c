@@ -195,7 +195,7 @@ void user_input(uint8_t port, vnsem_machine *machine)
 
 void process_instruction(uint8_t ins, vnsem_machine *m)
 {
-    switch(ins) {
+    switch (ins) {
         /* ----- TRANSFER ----- */
         case 0x7d: /* MOV A,L */ m->accu = m->reg_l;                   break;
         case 0x7e: /* MOV A,M */ m->accu = m->mem[m->reg_l];           break;
@@ -332,7 +332,7 @@ int main(int argc, char **argv)
     config.dump_mem_on_halt = FALSE;
 
     while (-1 != (opt = getopt(argc, argv, "hvis:d"))) {
-        switch(opt) {
+        switch (opt) {
             case 'h':
                 print_usage(process_name);
                 return EXIT_SUCCESS;

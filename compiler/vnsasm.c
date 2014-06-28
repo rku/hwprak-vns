@@ -246,7 +246,7 @@ int main(int argc, char **argv)
 
     /* parse cmdline arguments */
     while ((opt = getopt(argc, argv, "ho:vzr")) != -1) {
-        switch(opt) {
+        switch (opt) {
             case 'h':
                 print_usage(process_name);
                 return EXIT_SUCCESS;

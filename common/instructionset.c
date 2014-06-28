@@ -121,24 +121,27 @@ int inscmp(const void *key, const void *other)
  * Compare a mnemonic (key) with the mnemonic of an
  * instruction (other).
  */
-int mnemoniccmp(const void *key, const void *other)
+int mnemonic_name_cmp(const void *key, const void *other)
 {
     vns_instruction *ins = (vns_instruction*)other;
     return strcmp((char*)key, ins->mnemonic);
 }
 
 /**
- * Look up a mnemonic by its name and return a pointer to
- * its vns_instruction or NULL if it could not be found.
+ * Look up a mnemonic by its name and return 1 if it could
+ * be found or 0 otherwise.
  */
-vns_instruction *is_lookup_mnemonic(char *str)
+int is_lookup_mnemonic_name(char *str)
 {
     size_t ins_size = sizeof(vns_instruction);
     int n = sizeof(vns_instructionset) / ins_size;
 
-    return (vns_instruction*)bsearch((void*)str,
-            (void*)&vns_instructionset,
-            n, ins_size, mnemoniccmp);
+    if (NULL == bsearch((void*)str, (void*)&vns_instructionset,
+            n, ins_size, mnemonic_name_cmp)) {
+        return 0;
+    }
+
+    return 1;
 }
 
 /**

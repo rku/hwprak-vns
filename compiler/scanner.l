@@ -56,7 +56,7 @@ SP                  { yylval.ival = AT_REG_SP; return TOK_ARG; }
 
 (?i:{TEXT})         {
                         yylval.sval = strdup(yytext);
-                        if (NULL != is_lookup_mnemonic(yylval.sval)) {
+                        if (is_lookup_mnemonic_name(yylval.sval)) {
                             return TOK_INS;
                         }
                         return TOK_ID;

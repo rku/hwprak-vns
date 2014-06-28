@@ -9,6 +9,9 @@ In order to build the compiler and emulator, just type:
 
   make
 
+This software requires gnu bison/flex and libreadline to
+be built.
+
 
 Example usage:
 

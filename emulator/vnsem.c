@@ -71,8 +71,6 @@ void reset_machine(vnsem_machine *machine)
 
 void load_program(vnsem_machine *machine)
 {
-    uint8_t instruction = 0, addr = 0;
-
     /* load the program */
     if (NULL == (config.infile_d = fopen(config.infile_name, "r"))) {
         perror(config.infile_name);
@@ -81,9 +79,10 @@ void load_program(vnsem_machine *machine)
 
     printf("Loading program...");
 
-    while (1 == fread((void*)&instruction, 1, 1, config.infile_d)) {
-        machine->mem[addr++] = instruction;
-    }
+    fread((void*)&machine->mem[0],
+          sizeof(machine->mem),
+          1,
+          config.infile_d);
 
     fclose(config.infile_d);
 

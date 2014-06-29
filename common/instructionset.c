@@ -124,7 +124,7 @@ int inscmp(const void *key, const void *other)
 int mnemonic_name_cmp(const void *key, const void *other)
 {
     vns_instruction *ins = (vns_instruction*)other;
-    return strcmp((char*)key, ins->mnemonic);
+    return strcasecmp((char*)key, ins->mnemonic);
 }
 
 /**

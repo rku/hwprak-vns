@@ -34,6 +34,8 @@ typedef struct _vnsem_machine {
     uint8_t step_mode;
     uint8_t halted;
     uint8_t int_active;
+    uint8_t break_enabled;
+    uint8_t break_point;
     /* the memory unit */
     uint8_t mem[256];
     /* register */

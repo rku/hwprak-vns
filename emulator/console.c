@@ -27,6 +27,7 @@
 
 #define CONSOLE_COMMAND_MAX_ARGS (5)
 
+void console_break(int argc, char **argv, vnsem_machine *machine);
 void console_help(int argc, char **argv, vnsem_machine *machine);
 void console_load(int argc, char **argv, vnsem_machine *machine);
 void console_machine(int argc, char **argv, vnsem_machine *machine);
@@ -42,6 +43,8 @@ void console_step(int argc, char **argv, vnsem_machine *machine);
  * command name.
  */
 static console_command console_commands[] = {
+    { "break",   console_break,   "Set break point.",
+                 0, 1,            "[<addr>|clear]"                 },
     { "help",    console_help,    "Show help for commands.",
                  0, 1,            "<command>"                      },
     { "load",    console_load,    "Load a program.",
@@ -81,6 +84,37 @@ console_command *find_command(char *name)
             n, size, commandcmp);
 
     return cmd;
+}
+
+void console_break(int argc, char **argv, vnsem_machine *machine)
+{
+    uint8_t addr = 0;
+
+    if (argc == 1) {
+        if (machine->break_enabled) {
+            printf("Current break point at address 0x%.2x.\n",
+                    machine->break_point);
+        } else {
+            printf("No breakpoint set.\n");
+        }
+
+        return;
+    }
+
+    if (!strncasecmp(argv[1], "clear", 5)) {
+        machine->break_enabled = FALSE;
+        printf("Break point cleared.\n");
+        return;
+    }
+
+    if (!util_strtouint8(argv[1], &addr)) {
+        printf("Invalid address: %s\n", argv[1]);
+        return;
+    }
+
+    machine->break_point = addr;
+    machine->break_enabled = TRUE;
+    printf("Break point set at address 0x%.2x\n", addr);
 }
 
 void console_help(int argc, char **argv, vnsem_machine *machine)

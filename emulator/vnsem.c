@@ -329,8 +329,15 @@ int emulate(void)
             machine.halted = TRUE;
         }
 
+        /* check for step mode */
         if (machine.step_mode) {
             machine.step_mode = FALSE;
+            machine.halted = TRUE;
+        }
+
+        /* check if we have reached a breakpoint */
+        if (machine.break_enabled && machine.pc == machine.break_point) {
+            printf("Break point 0x%.2x reached.\n", machine.break_point);
             machine.halted = TRUE;
         }
 

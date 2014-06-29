@@ -58,18 +58,19 @@ void dump_memory(vnsem_machine *machine)
 
     /* column marker */
     printf("\n        ");
-    for (i = 0; i < (machine->pc % 8); ++i) { printf("   "); }
+    for (i = 0; i < (machine->pc % 16); ++i) { printf("   "); }
     printf("vv\n");
 
     printf(" 0x00   ");
     for (i = 0; i <= 256; ++i) {
-        if (i > 0 && !(i % 8)) {
+        if (i > 0 && !(i % 16)) {
+            printf("  0x%.2x ", i - 1);
             /* row marker */
             if (line == (floor(machine->pc / 8.0))) {
                 printf("<");
             }
             ++line;
-            if (line >= 32) break;
+            if (line >= 16) break;
             printf("\n 0x%.2x   ", i);
         }
         printf("%.2x ", machine->mem[i]);

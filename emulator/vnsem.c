@@ -297,8 +297,7 @@ int emulate(void)
                         "\nError: Unknown instruction 0x%.2x at address 0x%.2x.\n",
                         next_ins, machine.pc - 1);
                 dump_memory(&machine);
-                exit(EXIT_FAILURE);
-                break;
+                return EXIT_FAILURE;
             }
             default: {
                 fprintf(stderr,
@@ -306,7 +305,7 @@ int emulate(void)
                         "at address 0x%.2x for unknown reason.\n",
                         next_ins, machine.pc - 1);
                 dump_memory(&machine);
-                exit(EXIT_FAILURE);
+                return EXIT_FAILURE;
             }
         }
 

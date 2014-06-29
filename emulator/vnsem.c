@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <math.h>
 #include <readline/readline.h>
 
 #include "globals.h"
@@ -53,10 +54,24 @@ void print_key(void)
 
 void dump_memory(vnsem_machine *machine)
 {
-    int i;
-    printf("\n 0x00   ");
-    for (i = 0; i < 256; ++i) {
-        if (i > 0 && !(i % 8)) printf("\n 0x%.2x   ", i);
+    int i, line = 0;
+
+    /* column marker */
+    printf("\n        ");
+    for (i = 0; i < (machine->pc % 8); ++i) { printf("   "); }
+    printf("vv\n");
+
+    printf(" 0x00   ");
+    for (i = 0; i <= 256; ++i) {
+        if (i > 0 && !(i % 8)) {
+            /* row marker */
+            if (line == (floor(machine->pc / 8.0))) {
+                printf("<");
+            }
+            ++line;
+            if (line >= 32) break;
+            printf("\n 0x%.2x   ", i);
+        }
         printf("%.2x ", machine->mem[i]);
     }
     printf("\n\n");

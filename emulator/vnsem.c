@@ -305,7 +305,8 @@ int emulate(void)
         }
         default:
             fprintf(stderr,
-                    "\nError: Could not execute instruction 0x%.2x at address 0x%.2x for unknown reason.\n",
+                    "\nError: Could not execute instruction 0x%.2x "
+                    "at address 0x%.2x for unknown reason.\n",
                     next_ins, machine.pc - 1);
             dump_memory(&machine);
             exit(EXIT_FAILURE);

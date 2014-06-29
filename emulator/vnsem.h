@@ -24,15 +24,14 @@ typedef struct _vnsem_configuration {
     uint8_t interactive_mode;
     uint8_t verbose_mode;
     uint16_t step_time_ms;
-    uint8_t dump_mem_on_halt;
     char *infile_name;
-    FILE *infile_d;
 } vnsem_configuration;
 
 typedef uint8_t led;
 
 typedef struct _vnsem_machine {
     unsigned int step_count;
+    uint8_t step_mode;
     uint8_t halted;
     uint8_t int_active;
     /* the memory unit */
@@ -49,5 +48,11 @@ typedef struct _vnsem_machine {
 #define F_CARRY 0x1
 #define F_ZERO  0x2
 #define F_SIGN  0x4
+
+void dump_memory(vnsem_machine *machine);
+void reset_machine(vnsem_machine *machine);
+int load_program(char *filepath, uint8_t offset, vnsem_machine *machine);
+
+#define ERR_ILLEGAL_INSTRUCTION (1)
 
 #endif /* VNSEM_H */

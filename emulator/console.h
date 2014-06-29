@@ -14,13 +14,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef UTILS_H
-#define UTILS_H 1
+#ifndef CONSOLE_H
+#define CONSOLE_H 1
 
-#include <stdint.h>
+#include "vnsem.h"
 
-char *util_basename(char *path);
-void util_str_toupper(char *str);
-int util_strtouint8(char *str, uint8_t *result);
+typedef struct _console_command {
+    char *name;
+    void (*func)(int, char**, vnsem_machine*);
+    char *description;
+    int minargs;
+    int maxargs;
+    char *usage;
+} console_command;
 
-#endif /* UTILS_H */
+void vnsem_console(vnsem_machine *machine);
+console_command *find_command(char *name);
+
+#endif /* CONSOLE_H */

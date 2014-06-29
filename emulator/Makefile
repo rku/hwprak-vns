@@ -2,7 +2,8 @@ CC=gcc
 CFLAGS=-Wall -O2 -I ../common/
 LDFLAGS=-lreadline
 
-vnsem: vnsem.c vnsem.h ../common/utils.c
+vnsem: vnsem.c vnsem.h console.c console.h \
+	../common/utils.c ../common/utils.h
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 clean:

@@ -23,9 +23,8 @@
 
 #include "globals.h"
 #include "utils.h"
+#include "console.h"
 #include "vnsem.h"
-
-#define ERR_ILLEGAL_INSTRUCTION (1)
 
 vnsem_configuration config;
 
@@ -69,30 +68,27 @@ void reset_machine(vnsem_machine *machine)
     memset(machine, 0, sizeof(*machine));
 }
 
-void load_program(vnsem_machine *machine)
+int load_program(char *filepath, uint8_t offset, vnsem_machine *machine)
 {
+    FILE *in;
+
     /* load the program */
-    if (NULL == (config.infile_d = fopen(config.infile_name, "r"))) {
-        perror(config.infile_name);
-        exit(EXIT_FAILURE);
+    if (NULL == (in = fopen(filepath, "r"))) {
+        perror(filepath);
+        return FALSE;
     }
 
-    printf("Loading program...");
+    printf("Loading program '%s'...", filepath);
+    fread((void*)&machine->mem[offset], 1, sizeof(machine->mem) - offset, in);
+    fclose(in);
+    printf("done.\n");
 
-    fread((void*)&machine->mem[0],
-          1,
-          sizeof(machine->mem),
-          config.infile_d);
-
-    fclose(config.infile_d);
-
-    printf("Done.\n");
+    return TRUE;
 }
 
 void handle_interrupt(int signal)
 {
-    printf("\nInterrupt received. ");
-    printf("(Interrupt handling not yet implemented.)\n");
+    printf("\nInterrupt received.\n");
     exit(EXIT_SUCCESS);
 }
 
@@ -166,6 +162,35 @@ void accu_op(int16_t result, vnsem_machine *machine)
     machine->accu = (value < 0) ? -value : value;
 }
 
+void set_block_sigint(uint8_t do_block)
+{
+    sigset_t sigs;
+
+    sigemptyset(&sigs);
+    sigaddset(&sigs, SIGINT);
+
+    sigprocmask((do_block) ? SIG_BLOCK : SIG_UNBLOCK, &sigs, NULL);
+}
+
+int sigint_is_pending(void)
+{
+    int sig = 0;
+    sigset_t sigs;
+
+    if (0 == sigpending(&sigs) && sigismember(&sigs, SIGINT)) {
+        sigwait(&sigs, &sig); /* eat signal */
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+void console(vnsem_machine *machine) {
+    set_block_sigint(FALSE);
+    vnsem_console(machine);
+    set_block_sigint(TRUE);
+}
+
 void user_output(uint8_t port, vnsem_machine *machine)
 {
     printf("[%.2x] Program output => 0x%x (%i)\n",
@@ -174,15 +199,20 @@ void user_output(uint8_t port, vnsem_machine *machine)
 
 void user_input(uint8_t port, vnsem_machine *machine)
 {
-    short int value;
+    short int result;
+    uint16_t value;
     char prompt[32], *input;
 
     snprintf((char*)&prompt, 32, "[%.2x] Program input => ", port);
 
     while (1) {
+        set_block_sigint(FALSE);
         input = readline(prompt);
+        set_block_sigint(TRUE);
 
-        if (NULL != input && 1 == sscanf(input, "%hd", &value)) {
+        if (NULL != input &&
+                1 == sscanf(input, "%hi", &result) &&
+                abs(result) < 256) {
             free(input);
             break;
         }
@@ -191,7 +221,8 @@ void user_input(uint8_t port, vnsem_machine *machine)
         free(input);
     }
 
-    machine->accu = value;
+    value = result;
+    accu_op(value, machine);
 }
 
 int process_instruction(uint8_t ins, vnsem_machine *m)
@@ -276,50 +307,60 @@ int emulate(void)
     vnsem_machine machine;
     reset_machine(&machine);
 
-    load_program(&machine);
+    if (NULL != config.infile_name) {
+        if (!load_program(config.infile_name, 0, &machine)) {
+            machine.halted = TRUE;
+        }
+    }
+
+    if (config.interactive_mode) {
+        machine.halted = TRUE;
+    }
 
     print_key();
 
-    signal(SIGINT, handle_interrupt);
+    /* block SIGINT in order to use sigpending() */
+    set_block_sigint(TRUE);
 
     while (1) {
+        /* check for pending SIGINT */
+        if (sigint_is_pending()) {
+            printf("Interrupt received. Dropping into console.\n");
+            machine.halted = TRUE;
+        }
+
+        if (machine.step_mode) {
+            machine.step_mode = FALSE;
+            machine.halted = TRUE;
+        }
+
+        while (machine.halted) {
+            printf("Machine halted.\n");
+            console(&machine);
+        }
+
         next_ins = machine.mem[machine.pc];
         ++machine.pc;
         ++machine.step_count;
 
         switch (process_instruction(next_ins, &machine)) {
-            case 0: {
-                break;
-            }
-            case ERR_ILLEGAL_INSTRUCTION: {
+            case 0: break;
+            case ERR_ILLEGAL_INSTRUCTION:
                 fprintf(stderr,
-                        "\nError: Unknown instruction 0x%.2x "
+                        "Error: Unknown instruction 0x%.2x "
                         "at address 0x%.2x.\n",
                         next_ins, machine.pc - 1);
-                dump_memory(&machine);
-                return EXIT_FAILURE;
-            }
-            default: {
+                console(&machine);
+            default:
                 fprintf(stderr,
-                        "\nError: Could not execute instruction 0x%.2x "
+                        "Error: Could not execute instruction 0x%.2x "
                         "at address 0x%.2x for unknown reason.\n",
                         next_ins, machine.pc - 1);
-                dump_memory(&machine);
-                return EXIT_FAILURE;
-            }
+                console(&machine);
         }
 
         print_machine_state(&machine);
-
         usleep(config.step_time_ms * 1000);
-
-        if (machine.halted) {
-            printf("Machine halted.\n");
-            if (config.dump_mem_on_halt) {
-                dump_memory(&machine);
-            }
-            while (machine.halted) sleep(1);
-        }
     }
 
     return EXIT_SUCCESS;
@@ -327,12 +368,11 @@ int emulate(void)
 
 void print_usage(char *pname)
 {
-    printf("\nUsage: %s [-h] | [-v] [-i] [-s <ms>] <program>\n\n", pname);
+    printf("\nUsage: %s [-h] | [-v] [-i] [-s <ms>] [<program>]\n\n", pname);
     printf("  -h         Show this help text.\n");
     printf("  -v         Turn on verbose output.\n");
-    printf("  -i         Turn on interactive mode.\n");
+    printf("  -i         Enter console mode at startup.\n");
     printf("  -s <ms>    Set step time to <ms> milliseconds.\n");
-    printf("  -d         Dump memory when machine is halted.\n");
     printf("\n");
 }
 
@@ -348,7 +388,6 @@ int main(int argc, char **argv)
     config.verbose_mode = FALSE;
     config.step_time_ms = 0;
     config.infile_name = NULL;
-    config.dump_mem_on_halt = FALSE;
 
     while (-1 != (opt = getopt(argc, argv, "hvis:d"))) {
         switch (opt) {
@@ -362,14 +401,11 @@ int main(int argc, char **argv)
                 config.step_time_ms = strtol(optarg, &p, 10);
                 if (!optarg || *p) {
                     fprintf(stderr, "Invalid step time argument.\n");
-                    exit(EXIT_FAILURE);
+                    return EXIT_FAILURE;
                 }
                 break;
             case 'i':
                 config.interactive_mode = TRUE;
-                break;
-            case 'd':
-                config.dump_mem_on_halt = TRUE;
                 break;
             default:
                 print_usage(process_name);
@@ -377,12 +413,11 @@ int main(int argc, char **argv)
         }
     }
 
-    if (optind >= argc) {
-        print_usage(process_name);
-        return EXIT_SUCCESS;
+    if (optind < argc) {
+        config.infile_name = strdup(argv[optind]);
+    } else {
+        config.interactive_mode = TRUE;
     }
-
-    config.infile_name = strdup(argv[optind]);
 
     return emulate();
 }

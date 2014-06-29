@@ -15,9 +15,11 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
+#include "globals.h"
 #include "utils.h"
 
 char *util_basename(char *path)
@@ -39,4 +41,24 @@ void util_str_toupper(char *str)
         *p = toupper(*p);
         p++;
     }
+}
+
+/**
+ * Convert str to uint8_t and store the result in *result*.
+ * Returns TRUE on success or FALSE on error. On error the
+ * value of *result* is unspecified.
+ */
+int util_strtouint8(char *str, uint8_t *result)
+{
+    char *end;
+    long int res;
+
+    res = strtol(str, &end, 0);
+    *result = (res & 0xff);
+
+    if (*end == '\0' && *str != '\0' && res == *result) {
+        return TRUE;
+    }
+
+    return FALSE;
 }

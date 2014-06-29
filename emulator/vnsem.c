@@ -80,8 +80,8 @@ void load_program(vnsem_machine *machine)
     printf("Loading program...");
 
     fread((void*)&machine->mem[0],
-          sizeof(machine->mem),
           1,
+          sizeof(machine->mem),
           config.infile_d);
 
     fclose(config.infile_d);

@@ -294,7 +294,8 @@ int emulate(void)
             }
             case ERR_ILLEGAL_INSTRUCTION: {
                 fprintf(stderr,
-                        "\nError: Unknown instruction 0x%.2x at address 0x%.2x.\n",
+                        "\nError: Unknown instruction 0x%.2x "
+                        "at address 0x%.2x.\n",
                         next_ins, machine.pc - 1);
                 dump_memory(&machine);
                 return EXIT_FAILURE;

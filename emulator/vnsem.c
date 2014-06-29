@@ -288,28 +288,26 @@ int emulate(void)
         ++machine.pc;
         ++machine.step_count;
 
-        switch (process_instruction(next_ins, &machine))
-        {
-        case 0:
-        {
-            break;
-        }
-        case ERR_ILLEGAL_INSTRUCTION:
-        {
-            fprintf(stderr,
-                    "\nError: Unknown instruction 0x%.2x at address 0x%.2x.\n",
-                    next_ins, machine.pc - 1);
-            dump_memory(&machine);
-            exit(EXIT_FAILURE);
-            break;
-        }
-        default:
-            fprintf(stderr,
-                    "\nError: Could not execute instruction 0x%.2x "
-                    "at address 0x%.2x for unknown reason.\n",
-                    next_ins, machine.pc - 1);
-            dump_memory(&machine);
-            exit(EXIT_FAILURE);
+        switch (process_instruction(next_ins, &machine)) {
+            case 0: {
+                break;
+            }
+            case ERR_ILLEGAL_INSTRUCTION: {
+                fprintf(stderr,
+                        "\nError: Unknown instruction 0x%.2x at address 0x%.2x.\n",
+                        next_ins, machine.pc - 1);
+                dump_memory(&machine);
+                exit(EXIT_FAILURE);
+                break;
+            }
+            default: {
+                fprintf(stderr,
+                        "\nError: Could not execute instruction 0x%.2x "
+                        "at address 0x%.2x for unknown reason.\n",
+                        next_ins, machine.pc - 1);
+                dump_memory(&machine);
+                exit(EXIT_FAILURE);
+            }
         }
 
         print_machine_state(&machine);

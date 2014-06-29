@@ -94,7 +94,7 @@ void console_help(int argc, char **argv, vnsem_machine *machine)
         printf("\nCommands available:\n\n");
         for (; i < cmds_n; ++i) {
             cmd = &console_commands[i];
-            printf("  %-10s  %-70s\n", cmd->name, cmd->description);
+            printf("  %-10s  %s\n", cmd->name, cmd->description);
         }
         printf("\nYou may also try 'help <command>' for additional help.\n\n");
         return;

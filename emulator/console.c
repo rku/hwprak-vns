@@ -304,8 +304,9 @@ void vnsem_console(vnsem_machine *machine)
             exit(EXIT_SUCCESS);
         }
 
+        add_history(input);
+
         if (call_command_for_input(input, machine)) {
-            add_history(input);
             break;
         }
 

@@ -253,7 +253,7 @@ void console_step(int argc, char **argv, vnsem_machine *machine)
 int call_command_for_input(char *input, vnsem_machine *machine)
 {
     console_command *cmd;
-    char *argv[CONSOLE_COMMAND_MAX_ARGS], delim = ' ';
+    char *argv[CONSOLE_COMMAND_MAX_ARGS], *delim = " ";
     int args, argc = 0;
 
     /* skipt whitespaces */
@@ -266,11 +266,11 @@ int call_command_for_input(char *input, vnsem_machine *machine)
     }
 
     /* split up arguments */
-    input = strtok(input, &delim);
+    input = strtok(input, delim);
     while (NULL != input && argc < CONSOLE_COMMAND_MAX_ARGS) {
         argv[argc] = input;
         argc++;
-        input = strtok(NULL, &delim);
+        input = strtok(NULL, delim);
     }
     args = argc - 1; /* argc counts the command itself too */
 

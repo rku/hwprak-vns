@@ -66,7 +66,7 @@ void dump_memory(vnsem_machine *machine)
         if (i > 0 && !(i % 16)) {
             printf("  0x%.2x ", i - 1);
             /* row marker */
-            if (line == (floor(machine->pc / 8.0))) {
+            if (line == (floor(machine->pc / 16.0))) {
                 printf("<");
             }
             ++line;
@@ -238,6 +238,7 @@ void user_input(uint8_t port, vnsem_machine *machine)
     }
 
     value = result;
+    printf("----> %i\n", value);
     accu_op(value, machine);
 }
 

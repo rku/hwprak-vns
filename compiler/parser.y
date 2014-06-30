@@ -32,6 +32,7 @@ void yyerror(char*);
 %token <sval> TOK_INS;
 %token <sval> TOK_ID;
 
+%token TOK_DATA;
 %token TOK_OFFSET;
 %token TOK_NEWL;
 
@@ -63,7 +64,8 @@ instruction
     ;
 
 asm_command
-    : TOK_OFFSET TOK_INT     { prc_offset($2); }
+    : TOK_OFFSET TOK_INT            { prc_offset($2);   }
+    | TOK_DATA TOK_INT ',' TOK_INT  { prc_data($2, $4); }
     ;
 
 %%

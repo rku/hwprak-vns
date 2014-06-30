@@ -180,6 +180,11 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
     }
 }
 
+void prc_data(uint8_t addr, uint8_t value)
+{
+    config.program->data[addr] = value;
+}
+
 void prc_offset(uint8_t offset)
 {
     config.program->counter = offset;

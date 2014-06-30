@@ -46,6 +46,7 @@ WHITESPACE          [ \s\t\r\f]
 
 {SINGLE}            { return yytext[0];   }
 {COMMENT}           { return TOK_NEWL;    }
+\.(?i:data)         { return TOK_DATA;    }
 \.(?i:offset)       { return TOK_OFFSET;  }
 
 A                   { yylval.ival = AT_REG_A;  return TOK_ARG; }

@@ -53,6 +53,7 @@ void yyerror(char *error);
 
 void prc_label_decl(char *name);
 void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s);
+void prc_data(uint8_t addr, uint8_t value);
 void prc_offset(uint8_t offset);
 
 extern FILE *yyin;

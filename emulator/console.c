@@ -256,7 +256,7 @@ int call_command_for_input(char *input, vnsem_machine *machine)
     char *argv[CONSOLE_COMMAND_MAX_ARGS], *delim = " ";
     int args, argc = 0;
 
-    /* skipt whitespaces */
+    /* skip whitespaces */
     while (isspace(*input)) {
         ++input;
     }

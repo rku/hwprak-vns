@@ -56,3 +56,10 @@ The assembler is case insensitive.
                         ; address labeled 'foo2'
      HLT                ; halt
 
+* .memset <addr>: <value>
+
+  Set memory cell at <addr> to <value>
+
+  Example:
+
+     .memset 0x2e: 0x87

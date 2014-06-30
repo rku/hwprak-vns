@@ -42,7 +42,7 @@ void console_step(int argc, char **argv, vnsem_machine *machine);
  * This list is searched by binary search so keep it ordered by
  * command name.
  */
-static console_command console_commands[] = {
+static const console_command console_commands[] = {
     { "break",   console_break,   "Set break point.",
                  0, 1,            "[<addr>|clear]" },
     { "help",    console_help,    "Show help for commands.",
@@ -71,9 +71,9 @@ int commandcmp(const void *key, const void *other)
     return strcasecmp((char*)key, cmd->name);
 }
 
-console_command *find_command(char *name)
+const console_command *find_command(const char *name)
 {
-    console_command *cmd;
+    const console_command *cmd;
     size_t size;
     int n;
 
@@ -119,7 +119,7 @@ void console_break(int argc, char **argv, vnsem_machine *machine)
 
 void console_help(int argc, char **argv, vnsem_machine *machine)
 {
-    console_command *cmd;
+    const console_command *cmd;
 
     int i = 0;
     int cmds_n = sizeof(console_commands) / sizeof(console_command);
@@ -252,7 +252,7 @@ void console_step(int argc, char **argv, vnsem_machine *machine)
 
 int call_command(char *name, int argc, char **argv, vnsem_machine *machine)
 {
-    console_command *cmd;
+    const console_command *cmd;
     int arg_n = argc - 1; /* argc counts the command itself too */
 
     if (NULL != (cmd = find_command(name))) {

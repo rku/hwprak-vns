@@ -29,6 +29,6 @@ typedef struct _console_command {
 } console_command;
 
 void vnsem_console(vnsem_machine *machine);
-console_command *find_command(char *name);
+const console_command *find_command(const char *name);
 
 #endif /* CONSOLE_H */

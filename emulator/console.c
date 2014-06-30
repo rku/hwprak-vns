@@ -189,6 +189,7 @@ void console_load(int argc, char **argv, vnsem_machine *machine)
     }
 
     load_program(argv[1], off, machine);
+    machine->pc = off;
 }
 
 void console_machine(int argc, char **argv, vnsem_machine *machine)

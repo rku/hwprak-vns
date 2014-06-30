@@ -319,9 +319,9 @@ int call_command_for_input(const char *input, vnsem_machine *machine)
     if (*s) {
         /* split up arguments */
         s = strtok(s, delim);
-        while (NULL != input && argc < CONSOLE_COMMAND_MAX_ARGS) {
+        while (NULL != s && argc < CONSOLE_COMMAND_MAX_ARGS) {
             argv[argc++] = s;
-            input = strtok(NULL, delim);
+            s = strtok(NULL, delim);
         }
 
         result = call_command(argv[0], argc, (char**)&argv, machine);

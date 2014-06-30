@@ -44,10 +44,10 @@ WHITESPACE          [ \s\t\r\f]
                         return TOK_INT;
                     }
 
-{SINGLE}            { return yytext[0];   }
-{COMMENT}           { return TOK_NEWL;    }
-\.(?i:memset)       { return TOK_MEMSET;  }
-\.(?i:offset)       { return TOK_OFFSET;  }
+{SINGLE}            { return yytext[0];  }
+{COMMENT}           { return TOK_NEWL;   }
+\.(?i:memset)       { return TOK_MEMSET; }
+\.(?i:offset)       { return TOK_OFFSET; }
 
 A                   { yylval.ival = AT_REG_A;  return TOK_ARG; }
 L                   { yylval.ival = AT_REG_L;  return TOK_ARG; }

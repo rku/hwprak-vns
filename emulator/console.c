@@ -86,6 +86,39 @@ const console_command *find_command(const char *name)
     return cmd;
 }
 
+char *command_generator(const char *text, int state)
+{
+    static int len, index;
+    static int items = sizeof(console_commands) / sizeof(console_command);
+    char *name;
+
+    if (!state) {
+        index = 0;
+        len = strlen(text);
+    }
+
+    while (index < items) {
+        name = console_commands[index].name;
+        ++index;
+        if (0 == strncasecmp(name, text, len)) {
+            return strdup(name); /* readline will free this */
+        }
+    }
+
+    return NULL;
+}
+
+char **completion(const char *text, int start, int end)
+{
+    char **matches = NULL;
+
+    if (0 == start) {
+        matches = rl_completion_matches(text, command_generator);
+    }
+
+    return matches;
+}
+
 void console_break(int argc, char **argv, vnsem_machine *machine)
 {
     uint8_t addr = 0;
@@ -272,33 +305,37 @@ int call_command(char *name, int argc, char **argv, vnsem_machine *machine)
     return FALSE;
 }
 
-int call_command_for_input(char *input, vnsem_machine *machine)
+int call_command_for_input(const char *input, vnsem_machine *machine)
 {
     char *argv[CONSOLE_COMMAND_MAX_ARGS], *delim = " ";
-    int argc = 0;
+    char *s = strdup(input);
+    int result = FALSE, argc = 0;
 
     /* skip whitespaces */
-    while (isspace(*input)) {
-        ++input;
+    while (isspace(*s)) {
+        ++s;
     }
 
-    if (!*input) {
-        return FALSE;
+    if (*s) {
+        /* split up arguments */
+        s = strtok(s, delim);
+        while (NULL != input && argc < CONSOLE_COMMAND_MAX_ARGS) {
+            argv[argc++] = s;
+            input = strtok(NULL, delim);
+        }
+
+        result = call_command(argv[0], argc, (char**)&argv, machine);
     }
 
-    /* split up arguments */
-    input = strtok(input, delim);
-    while (NULL != input && argc < CONSOLE_COMMAND_MAX_ARGS) {
-        argv[argc++] = input;
-        input = strtok(NULL, delim);
-    }
-
-    return call_command(argv[0], argc, (char**)&argv, machine);
+    free(s);
+    return result;
 }
 
 void vnsem_console(vnsem_machine *machine)
 {
     char *input;
+
+    rl_attempted_completion_function = completion;
 
     while (1) {
         input = readline("VNSEM Console => ");
@@ -307,12 +344,13 @@ void vnsem_console(vnsem_machine *machine)
             exit(EXIT_SUCCESS);
         }
 
-        add_history(input);
-
         if (call_command_for_input(input, machine)) {
+            add_history(input);
             break;
         }
 
         free(input);
     }
+
+    rl_attempted_completion_function = NULL;
 }

@@ -250,11 +250,32 @@ void console_step(int argc, char **argv, vnsem_machine *machine)
     machine->step_mode = TRUE;
 }
 
-int call_command_for_input(char *input, vnsem_machine *machine)
+int call_command(char *name, int argc, char **argv, vnsem_machine *machine)
 {
     console_command *cmd;
+    int arg_n = argc - 1; /* argc counts the command itself too */
+
+    if (NULL != (cmd = find_command(name))) {
+        if (arg_n < cmd->minargs || arg_n > cmd->maxargs) {
+            printf("Invalid number of arguments.\n");
+            printf("Usage: %s %s\n", name,
+                    (NULL == cmd->usage) ? 
+                    "(No arguments allowed)" : cmd->usage);
+        } else {
+            cmd->func(argc, argv, machine);
+            return TRUE;
+        }
+    } else {
+        printf("Unknown command: %s\n", name);
+    }
+
+    return FALSE;
+}
+
+int call_command_for_input(char *input, vnsem_machine *machine)
+{
     char *argv[CONSOLE_COMMAND_MAX_ARGS], *delim = " ";
-    int args, argc = 0;
+    int argc = 0;
 
     /* skip whitespaces */
     while (isspace(*input)) {
@@ -268,29 +289,11 @@ int call_command_for_input(char *input, vnsem_machine *machine)
     /* split up arguments */
     input = strtok(input, delim);
     while (NULL != input && argc < CONSOLE_COMMAND_MAX_ARGS) {
-        argv[argc] = input;
-        argc++;
+        argv[argc++] = input;
         input = strtok(NULL, delim);
     }
-    args = argc - 1; /* argc counts the command itself too */
 
-    if (NULL != (cmd = find_command(argv[0]))) {
-        if (args < cmd->minargs || args > cmd->maxargs) {
-            printf("Invalid number of arguments.\n");
-            if (NULL != cmd->usage) {
-                printf("Usage: %s %s\n", argv[0], cmd->usage);
-            } else {
-                printf("No arguments allowed for '%s'.\n", argv[0]);
-            }
-        } else {
-            cmd->func(argc, (char**)&argv, machine);
-            return TRUE;
-        }
-     } else {
-         printf("Unknown command: %s\n", argv[0]);
-     }
-
-    return FALSE;
+    return call_command(argv[0], argc, (char**)&argv, machine);
 }
 
 void vnsem_console(vnsem_machine *machine)

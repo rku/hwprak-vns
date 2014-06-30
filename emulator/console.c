@@ -44,25 +44,25 @@ void console_step(int argc, char **argv, vnsem_machine *machine);
  */
 static console_command console_commands[] = {
     { "break",   console_break,   "Set break point.",
-                 0, 1,            "[<addr>|clear]"                 },
+                 0, 1,            "[<addr>|clear]" },
     { "help",    console_help,    "Show help for commands.",
-                 0, 1,            "<command>"                      },
+                 0, 1,            "<command>" },
     { "load",    console_load,    "Load a program.",
-                 1, 2,            "<programfile> [<offset>]"       },
+                 1, 2,            "<programfile> [<offset>]" },
     { "machine", console_machine, "Show machine information.",
-                 0, 0,            NULL                             },
+                 0, 0,            NULL },
     { "memdump", console_memdump, "Dump memory.",
-                 0, 1,            "[<addr>]"                       },
+                 0, 1,            "[<addr>]" },
     { "memset",  console_memset,  "Set content of a memory cell",
-                 2, 2,            "<addr> <value>"                 },
+                 2, 2,            "<addr> <value>" },
     { "quit",    console_quit,    "Quit the emulator.",
-                 0, 0,            NULL                             },
+                 0, 0,            NULL },
     { "reset",   console_reset,   "Reset (parts of) the machine.",
-                 1, 1,            "pc|mem|all"                     },
+                 1, 1,            "pc|mem|all" },
     { "run",     console_run,     "Start the machine.",
-                 0, 0,            NULL                             },
+                 0, 0,            NULL },
     { "step",    console_step,    "Execute next stepwise.",
-                 0, 0,            NULL                             }
+                 0, 0,            NULL }
 };
 
 int commandcmp(const void *key, const void *other)

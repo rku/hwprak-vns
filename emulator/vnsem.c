@@ -173,9 +173,8 @@ void compare(uint8_t other, vnsem_machine *machine)
 
 void accu_op(int16_t result, vnsem_machine *machine)
 {
-    uint8_t value = (result & 0xff);
     update_flags_for_value(result, machine);
-    machine->accu = (result < 0) ? -value : value;
+    machine->accu = (result & 0xff);
 }
 
 void set_block_sigint(uint8_t do_block)

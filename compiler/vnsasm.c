@@ -136,8 +136,6 @@ void resolve_label(char *name)
     } else {
         *byte = label->addr;
     }
-
-    ++config.program->counter;
 }
 
 void finalize_labels(void)
@@ -162,7 +160,12 @@ void finalize_labels(void)
 void push_byte(uint8_t byte)
 {
     config.program->data[config.program->counter] = byte;
-    ++(config.program->counter);
+    config.program->counter++;
+}
+
+void skip_byte(void)
+{
+    config.program->counter++;
 }
 
 void prc_label_decl(char *name)
@@ -190,6 +193,7 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
     if (NULL != s && ((ins->at1 & AT_LABEL) || (ins->at2 & AT_LABEL))) {
         util_str_toupper(s);
         resolve_label(s);
+        skip_byte();
     } else
     if ((ins->at1 & AT_INT) || (ins->at2 & AT_INT)) {
         push_byte(i);

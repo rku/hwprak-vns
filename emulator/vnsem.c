@@ -255,19 +255,19 @@ int process_instruction(uint8_t ins, vnsem_machine *m)
         case 0x6e: /* MOV L,M */ m->reg_l = m->mem[m->reg_l];          break;
         case 0x2e: /* MVI L,n */ m->reg_l = read_arg(m);               break;
         case 0x31: /* LXI SP,n*/ m->sp = read_arg(m);                  break;
-        case 0xf5: /* PUSH A  */ --m->sp; m->mem[m->sp] = m->accu;     break;
-        case 0xe5: /* PUSH L  */ --m->sp; m->mem[m->sp] = m->reg_l;    break;
-        case 0xed: /* PUSH FL */ --m->sp; m->mem[m->sp] = m->flags;    break;
-        case 0xf1: /* POP A   */ m->accu  = m->mem[m->sp]; ++m->sp;    break;
-        case 0xe1: /* POP L   */ m->reg_l = m->mem[m->sp]; ++m->sp;    break;
-        case 0xfd: /* POP FL  */ m->flags = m->mem[m->sp]; ++m->sp;    break;
+        case 0xf5: /* PUSH A  */ m->sp--; m->mem[m->sp] = m->accu;     break;
+        case 0xe5: /* PUSH L  */ m->sp--; m->mem[m->sp] = m->reg_l;    break;
+        case 0xed: /* PUSH FL */ m->sp--; m->mem[m->sp] = m->flags;    break;
+        case 0xf1: /* POP A   */ m->accu  = m->mem[m->sp]; m->sp++;    break;
+        case 0xe1: /* POP L   */ m->reg_l = m->mem[m->sp]; m->sp++;    break;
+        case 0xfd: /* POP FL  */ m->flags = m->mem[m->sp]; m->sp++;    break;
         case 0xdb: /* IN adr  */ user_input(read_arg(m), m);           break;
         case 0xd3: /* OUT adr */ user_output(read_arg(m), m);          break;
         /* ------ ARITHMETIC  ------ */
         case 0x3c: /* INR A */ accu_op(m->accu + 1, m);                break;
-        case 0x2c: /* INR L */ ++m->reg_l;                             break;
+        case 0x2c: /* INR L */ m->reg_l++;                             break;
         case 0x3d: /* DCR A */ accu_op(m->accu - 1, m);                break;
-        case 0x2d: /* DCR L */ --m->reg_l;                             break;
+        case 0x2d: /* DCR L */ m->reg_l--;                             break;
         case 0x87: /* ADD A */ accu_op(m->accu * 2, m);                break;
         case 0x85: /* ADD L */ accu_op(m->accu + m->reg_l, m);         break;
         case 0x86: /* ADD M */ accu_op(m->accu + m->mem[m->reg_l], m); break;
@@ -304,7 +304,7 @@ int process_instruction(uint8_t ins, vnsem_machine *m)
         case 0xda: /* JC  adr */ con_jmp(read_arg(m), F_CARRY, m);     break;
         case 0xd2: /* JNC adr */ con_no_jmp(read_arg(m), F_CARRY, m);  break;
         case 0xd4: /* CNC adr */ con_no_call(read_arg(m), F_CARRY, m); break;
-        case 0xc9: /* RET     */ m->pc = m->mem[m->sp]; ++m->sp;       break;
+        case 0xc9: /* RET     */ m->pc = m->mem[m->sp]; m->sp++;       break;
         /* ----- SPECIAL ----- */
         case 0x76: /* HLT */ m->halted = TRUE;                         break;
         case 0x00: /* NOP */                                           break;
@@ -363,8 +363,8 @@ int emulate(void)
         }
 
         next_ins = machine.mem[machine.pc];
-        ++machine.pc;
-        ++machine.step_count;
+        machine.pc++;
+        machine.step_count++;
 
         switch (process_instruction(next_ins, &machine)) {
             case 0: break;

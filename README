@@ -58,7 +58,7 @@ The assembler is case insensitive.
 
 * .byte <value> [, <value2> [, ...]]
 
-  Set current address to <value>
+  Set byte at current position to <value>.
 
   Example:
 

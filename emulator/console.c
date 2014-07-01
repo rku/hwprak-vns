@@ -141,7 +141,7 @@ void console_break(int argc, char **argv, vnsem_machine *machine)
     }
 
     if (!util_strtouint8(argv[1], &addr)) {
-        printf("Invalid address: %s\n", argv[1]);
+        util_perror("Invalid address: %s\n", argv[1]);
         return;
     }
 
@@ -183,7 +183,7 @@ void console_load(int argc, char **argv, vnsem_machine *machine)
 
     if (3 == argc) {
         if (!util_strtouint8(argv[2], &off)) {
-            printf("Invalid offset address: %s\n", argv[2]);
+            util_perror("Invalid offset address: %s\n", argv[2]);
             return;
         }
     }
@@ -218,7 +218,7 @@ void console_memdump(int argc, char **argv, vnsem_machine *machine)
 
     if (2 == argc) {
         if (!util_strtouint8(argv[1], &addr)) {
-            printf("Invalid address: %s\n", argv[1]);
+            util_perror("Invalid address: %s\n", argv[1]);
             return;
         }
 
@@ -235,12 +235,12 @@ void console_memset(int argc, char **argv, vnsem_machine *machine)
     uint8_t a = 0, v = 0;
 
     if (!util_strtouint8(argv[1], &a)) {
-        printf("Invalid address: %s\n", argv[1]);
+        util_perror("Invalid address: %s\n", argv[1]);
         return;
     }
 
     if (!util_strtouint8(argv[2], &v)) {
-        printf("Invalid value: %s\n", argv[2]);
+        util_perror("Invalid value: %s\n", argv[2]);
         return;
     }
 
@@ -269,7 +269,7 @@ void console_reset(int argc, char **argv, vnsem_machine *machine)
         machine->halted = TRUE;
         printf("Machine has been reset.\n");
     } else {
-        printf("Invalid argument.\n");
+        util_perror("Invalid argument.\n");
     }
 }
 

@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <ctype.h>
 
 #include "globals.h"
@@ -61,4 +62,14 @@ int util_strtouint8(char *str, uint8_t *result)
     }
 
     return FALSE;
+}
+
+void util_perror(const char *fmt, ...)
+{
+    va_list args;
+
+    va_start(args, fmt);
+    fprintf(stderr, "Error: ");
+    vfprintf(stderr, fmt, args);
+    va_end(args);
 }

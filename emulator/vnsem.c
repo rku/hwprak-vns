@@ -232,7 +232,7 @@ void user_input(uint8_t port, vnsem_machine *machine)
             break;
         }
 
-        fprintf(stderr, "Bad input. Expected byte in hex/dec notation.\n");
+        util_perror("Bad input. Expected byte in hex/dec notation.\n");
         free(input);
     }
 
@@ -369,16 +369,14 @@ int emulate(void)
         switch (process_instruction(next_ins, &machine)) {
             case 0: break;
             case ERR_ILLEGAL_INSTRUCTION:
-                fprintf(stderr,
-                        "Error: Unknown instruction 0x%.2x "
-                        "at address 0x%.2x.\n",
-                        next_ins, machine.pc - 1);
+                util_perror("Unknown instruction 0x%.2x "
+                            "at address 0x%.2x.\n",
+                            next_ins, machine.pc - 1);
                 console(&machine);
             default:
-                fprintf(stderr,
-                        "Error: Could not execute instruction 0x%.2x "
-                        "at address 0x%.2x for unknown reason.\n",
-                        next_ins, machine.pc - 1);
+                util_perror("Could not execute instruction 0x%.2x "
+                            "at address 0x%.2x for unknown reason.\n",
+                            next_ins, machine.pc - 1);
                 console(&machine);
         }
 
@@ -423,7 +421,7 @@ int main(int argc, char **argv)
             case 's':
                 config.step_time_ms = strtol(optarg, &p, 10);
                 if (!optarg || *p) {
-                    fprintf(stderr, "Invalid step time argument.\n");
+                    util_perror("Invalid step time argument.\n");
                     return EXIT_FAILURE;
                 }
                 break;

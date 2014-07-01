@@ -22,5 +22,6 @@
 char *util_basename(char *path);
 void util_str_toupper(char *str);
 int util_strtouint8(char *str, uint8_t *result);
+void util_perror(const char *fmt, ...);
 
 #endif /* UTILS_H */

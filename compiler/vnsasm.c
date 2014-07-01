@@ -27,7 +27,7 @@ vnsasm_configuration config;
 
 void yyerror(char *error)
 {
-    fprintf(stderr, "%s near line %i\n", error, yylineno);
+    util_perror("%s near line %i\n", error, yylineno);
     exit(EXIT_FAILURE);
 }
 
@@ -162,9 +162,9 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
     ins = is_find_mnemonic(mnemonic, at1, at2);
 
     if (NULL == ins) {
-        fprintf(stderr, "Error near line %i: ", yylineno);
-        fprintf(stderr, "Unknown instruction '%s' or ", mnemonic);
-        fprintf(stderr, "invalid argument types!\n");
+        util_perror("near line %i: Unknown instruction '%s' "
+                    "or invalid argument types!\n",
+                    yylineno, mnemonic);
         exit(EXIT_FAILURE);
     }
 

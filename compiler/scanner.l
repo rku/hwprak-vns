@@ -46,7 +46,7 @@ WHITESPACE          [ \s\t\r\f]
 
 {SINGLE}            { return yytext[0];  }
 {COMMENT}           { return TOK_NEWL;   }
-\.(?i:memset)       { return TOK_MEMSET; }
+\.(?i:byte)         { return TOK_BYTE; }
 \.(?i:offset)       { return TOK_OFFSET; }
 
 A                   { yylval.ival = AT_REG_A;  return TOK_ARG; }
@@ -65,5 +65,6 @@ SP                  { yylval.ival = AT_REG_SP; return TOK_ARG; }
 
 \n                  { return TOK_NEWL;       }
 {WHITESPACE}+       { /* skip whitespaces */ }
+.                   { return TOK_UNKNOWN;    }
 
 %%

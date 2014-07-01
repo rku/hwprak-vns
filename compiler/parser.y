@@ -32,9 +32,10 @@ void yyerror(char*);
 %token <sval> TOK_INS;
 %token <sval> TOK_ID;
 
-%token TOK_MEMSET;
+%token TOK_BYTE;
 %token TOK_OFFSET;
 %token TOK_NEWL;
+%token TOK_UNKNOWN;
 
 %%
 
@@ -70,8 +71,17 @@ instruction
     ;
 
 asm_command
-    : TOK_OFFSET TOK_INT             { prc_offset($2);   }
-    | TOK_MEMSET TOK_INT ':' TOK_INT { prc_data($2, $4); }
+    : offset
+    | byte
+    ;
+
+offset
+    : TOK_OFFSET TOK_INT    { prc_offset($2); }
+    ;
+
+byte
+    : TOK_BYTE TOK_INT      { prc_byte($2); }
+    | byte ',' TOK_INT      { prc_byte($3); }
     ;
 
 %%

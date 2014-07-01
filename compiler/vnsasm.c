@@ -57,32 +57,18 @@ void write_program(void)
     fclose(outfile);
 }
 
-void backpatch_labels(void)
+void backpatch_label(vnsasm_label *label)
 {
-    vnsasm_label *label;
-    list_item *pos, *item = config.program->labels.head;
+    list_item *pos;
+    assert(-1 != label->addr);
 
-    while (NULL != item) {
-        label = (vnsasm_label*)item->payload;
-
-        if (-1 == label->addr) {
-            fprintf(stderr, "Could not resolve label: %s\n", label->name);
-            exit(EXIT_FAILURE);
-        }
-
-        if (config.print_resolved_labels) {
-            printf(" -> Label '%s' resolved to address 0x%.2x (%i)\n",
-                    label->name, label->addr, label->addr);
-        }
-
-        pos = label->positions.head;
-        while (NULL != pos) {
-            *((uint8_t*)pos->payload) = label->addr;
-            pos = pos->next;
-        }
-
-        item = item->next;
+    pos = label->positions.head;
+    while (NULL != pos) {
+        *((uint8_t*)pos->payload) = label->addr;
+        pos = pos->next;
     }
+
+    list_destroy(&label->positions);
 }
 
 vnsasm_label *find_label(char *name)
@@ -108,12 +94,13 @@ vnsasm_label* declare_label(char *name, unsigned int addr)
     if (NULL != (label = find_label(name))) {
         /* label exists */
         if ((-1 != addr) && (-1 == label->addr)) {
-            /* label has not been declared yet */
+            /* we've found the declaration for a pending label */
             label->addr = addr;
+            backpatch_label(label);
         } else {
-            fprintf(stderr,
-                    "Duplicated label declaration near line %i: %s\n",
-                    yylineno, name);
+            util_perror("Duplicated label declaration "
+                        "near line %i: %s\n",
+                        yylineno, name);
             exit(EXIT_FAILURE);
         }
     } else {
@@ -121,7 +108,11 @@ vnsasm_label* declare_label(char *name, unsigned int addr)
 
         label->name = strdup(name);
         label->addr = addr;
-        list_init(&label->positions);
+
+        if (-1 == addr) {
+            /* pending label */
+            list_init(&label->positions);
+        }
 
         list_insert(&config.program->labels, NULL, label, free);
     }
@@ -129,17 +120,43 @@ vnsasm_label* declare_label(char *name, unsigned int addr)
     return label;
 }
 
-void push_label_mark(char *name)
+void resolve_label(char *name)
 {
     vnsasm_label *label;
+    uint8_t *byte = &config.program->data[config.program->counter];
 
     if (NULL == (label = find_label(name))) {
-        /* store label, that is not defined yet but mark it "pending" */
+        /* declare pending label */
         label = declare_label(name, -1);
     }
 
-    uint8_t *pos = &config.program->data[config.program->counter];
-    list_insert(&label->positions, NULL, (void*)pos, NULL);
+    if (-1 == label->addr) {
+        /* label is pending, store position of current byte */
+        list_insert(&label->positions, NULL, (void*)byte, NULL);
+    } else {
+        *byte = label->addr;
+    }
+
+    ++config.program->counter;
+}
+
+void finalize_labels(void)
+{
+    vnsasm_label *label;
+    list_item *item;
+ 
+    for (item = config.program->labels.head; NULL != item; item = item->next) {
+        label = (vnsasm_label*)item->payload;
+        if (-1 == label->addr) {
+            list_destroy(&label->positions);
+            util_perror("Could not resolve label: %s\n", label->name);
+            exit(EXIT_FAILURE);
+        }
+        if (config.print_resolved_labels) {
+            printf(" -> Label '%s' resolved to address 0x%.2x (%i)\n",
+                   label->name, label->addr, label->addr);
+        }
+    }
 }
 
 void push_byte(uint8_t byte)
@@ -172,9 +189,8 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
 
     if (NULL != s && ((ins->at1 & AT_LABEL) || (ins->at2 & AT_LABEL))) {
         util_str_toupper(s);
-        push_label_mark(s);
-    }
-
+        resolve_label(s);
+    } else
     if ((ins->at1 & AT_INT) || (ins->at2 & AT_INT)) {
         push_byte(i);
     }
@@ -207,7 +223,8 @@ int compile(void)
         return EXIT_FAILURE;
     }
 
-    backpatch_labels();
+    finalize_labels();
+
     write_program();
 
     list_destroy(&config.program->labels);

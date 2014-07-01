@@ -32,14 +32,15 @@ typedef uint8_t argtype;
 #define AT_LABEL    0x83    // set AT_INT, AT_ADDR too 
 
 typedef struct _vns_instruction {
-    char *mnemonic;
+    const char *mnemonic;
     argtype at1;
     argtype at2;
     uint8_t opcode;
 } vns_instruction;
 
-int is_lookup_mnemonic_name(char *str);
-vns_instruction *is_find_mnemonic(char *mnemonic, argtype at1, argtype at2);
+int is_lookup_mnemonic_name(const char *str);
+vns_instruction *is_find_mnemonic(const char *mnemonic,
+                                  argtype at1, argtype at2);
 vns_instruction *is_find_opcode(uint8_t opcode);
 
 #endif /* INSTRUCTIONSET_H */

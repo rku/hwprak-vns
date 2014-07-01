@@ -20,8 +20,7 @@
 #include <stdint.h>
 
 char *util_basename(char *path);
-void util_str_toupper(char *str);
-int util_strtouint8(char *str, uint8_t *result);
+int util_strtouint8(const char *str, uint8_t *result);
 void util_perror(const char *fmt, ...);
 
 #endif /* UTILS_H */

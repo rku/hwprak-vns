@@ -173,11 +173,12 @@ void prc_label_decl(const char *name)
     declare_label(name, config.program->counter);
 }
 
-void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
+void prc_ins(const char *mnemonic,
+             argtype at1, argtype at2,
+             uint8_t i, char *s)
 {
     vns_instruction *ins;
     
-    util_str_toupper(mnemonic);
     ins = is_find_mnemonic(mnemonic, at1, at2);
 
     if (NULL == ins) {

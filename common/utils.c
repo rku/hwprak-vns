@@ -34,22 +34,12 @@ char *util_basename(char *path)
     return path;
 }
 
-void util_str_toupper(char *str)
-{
-    char *p = str;
-
-    while (*p) {
-        *p = toupper(*p);
-        p++;
-    }
-}
-
 /**
  * Convert str to uint8_t and store the result in *result*.
  * Returns TRUE on success or FALSE on error. On error the
  * value of *result* is unspecified.
  */
-int util_strtouint8(char *str, uint8_t *result)
+int util_strtouint8(const char *str, uint8_t *result)
 {
     char *end;
     long int res;

@@ -102,7 +102,7 @@ int inscmp(const void *key, const void *other)
     vns_instruction *key_ins = (vns_instruction*)key;
     vns_instruction *other_ins = (vns_instruction*)other;
 
-    if (0 != (cmp = strcmp(key_ins->mnemonic, other_ins->mnemonic))) {
+    if (0 != (cmp = strcasecmp(key_ins->mnemonic, other_ins->mnemonic))) {
         return cmp;
     }
 
@@ -131,7 +131,7 @@ int mnemonic_name_cmp(const void *key, const void *other)
  * Look up a mnemonic by its name and return 1 if it could
  * be found or 0 otherwise.
  */
-int is_lookup_mnemonic_name(char *str)
+int is_lookup_mnemonic_name(const char *str)
 {
     size_t ins_size = sizeof(vns_instruction);
     int n = sizeof(vns_instructionset) / ins_size;
@@ -149,7 +149,8 @@ int is_lookup_mnemonic_name(char *str)
  * pointer on success or NULL if no such instruction can be found. This
  * lookup is done with binary search in O(log(n)).
  */
-vns_instruction *is_find_mnemonic(char *mnemonic, argtype at1, argtype at2)
+vns_instruction *is_find_mnemonic(const char *mnemonic,
+                                  argtype at1, argtype at2)
 {
     size_t ins_size;
     unsigned int n;

@@ -45,7 +45,7 @@ The assembler is case insensitive.
 
 * <label>:
   
-  Declares a label.
+  Declares a label. Note that labels are case sensitive.
 
   Example:
 

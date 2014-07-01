@@ -126,7 +126,7 @@ uint8_t read_arg(vnsem_machine *machine)
 
 void call(uint8_t addr, vnsem_machine *machine)
 {
-    --machine->sp;
+    machine->sp--;
     machine->mem[machine->sp] = machine->pc;
     machine->pc = addr;
 }

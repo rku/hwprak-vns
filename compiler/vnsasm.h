@@ -51,7 +51,7 @@ typedef struct _vnsasm_label {
 int yyparse(void);
 void yyerror(char *error);
 
-void prc_label_decl(char *name);
+void prc_label_decl(const char *name);
 void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s);
 void prc_byte(uint8_t value);
 void prc_offset(uint8_t offset);

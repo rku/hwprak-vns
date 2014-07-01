@@ -71,7 +71,7 @@ void backpatch_label(vnsasm_label *label)
     list_destroy(&label->positions);
 }
 
-vnsasm_label *find_label(char *name)
+vnsasm_label *find_label(const char *name)
 {
     vnsasm_label *label;
     list_item *item = config.program->labels.head;
@@ -87,7 +87,7 @@ vnsasm_label *find_label(char *name)
     return NULL;
 }
 
-vnsasm_label* declare_label(char *name, unsigned int addr)
+vnsasm_label* declare_label(const char *name, unsigned int addr)
 {
     vnsasm_label *label;
 
@@ -120,7 +120,7 @@ vnsasm_label* declare_label(char *name, unsigned int addr)
     return label;
 }
 
-void resolve_label(char *name)
+void resolve_label(const char *name)
 {
     vnsasm_label *label;
     uint8_t *byte = &config.program->data[config.program->counter];
@@ -168,9 +168,8 @@ void skip_byte(void)
     config.program->counter++;
 }
 
-void prc_label_decl(char *name)
+void prc_label_decl(const char *name)
 {
-    util_str_toupper(name);
     declare_label(name, config.program->counter);
 }
 
@@ -191,7 +190,6 @@ void prc_ins(char *mnemonic, argtype at1, argtype at2, uint8_t i, char *s)
     push_byte(ins->opcode);
 
     if (NULL != s && ((ins->at1 & AT_LABEL) || (ins->at2 & AT_LABEL))) {
-        util_str_toupper(s);
         resolve_label(s);
         skip_byte();
     } else

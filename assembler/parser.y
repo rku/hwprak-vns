@@ -62,14 +62,11 @@ instruction
     | TOK_INS TOK_INT   { prc_ins($1, AT_INT, AT_NONE, $2, NULL); }
     | TOK_INS TOK_ID    { prc_ins($1, AT_LABEL, AT_NONE, 0, $2);  }
     | TOK_INS TOK_ARG ',' TOK_INT {
-                          prc_ins($1, $2, AT_INT, $4, NULL);
-                        }
+                          prc_ins($1, $2, AT_INT, $4, NULL);      }
     | TOK_INS TOK_ARG ',' TOK_ARG {
-                          prc_ins($1, $2, $4, 0, NULL);
-                        }
+                          prc_ins($1, $2, $4, 0, NULL);           }
     | TOK_INS TOK_ARG ',' TOK_ID  {
-                          prc_ins($1, $2, AT_LABEL, 0, $4);
-                        }
+                          prc_ins($1, $2, AT_LABEL, 0, $4);       }
     | TOK_INS           { prc_ins($1, AT_NONE, AT_NONE, 0, NULL); }
     ;
 

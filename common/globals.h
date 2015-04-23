@@ -1,4 +1,7 @@
 /**
+ * This file is part of hwprak-vns.
+ * Copyright 2013-2015 (c) René Küttner <rene@spaceshore.net>
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
@@ -20,7 +23,7 @@
 #define VERSION "0.1"
 
 #define BANNER_LINE1 "TUD HWPRAK Von-Neumann System - %s\n"
-#define BANNER_LINE2 "Version %s - René Küttner <rene@bitkanal.net>\n"
+#define BANNER_LINE2 "Version %s - René Küttner <rene@spaceshore.net>\n"
 
 #ifndef TRUE
 #define TRUE 1

@@ -1,6 +1,7 @@
 *.bin
-compiler/parser.tab.*
-compiler/scanner.c
-compiler/vnsasm
 emulator/vnsem
+assembler/parser.tab.c
+assembler/parser.tab.h
+assembler/scanner.c
+assembler/vnsasm
 .*.swp

@@ -34,7 +34,7 @@ HEXNUM              0[xX][[:xdigit:]]+
 SINGLE              [,:]
 COMMENT             ;.*\n
 TEXT                [A-Z][A-Z0-9_]+
-WHITESPACE          [ \s\t\r\f]
+WHITESPACE          [[:space:]]
 
 %%
 

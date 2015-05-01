@@ -1,7 +1,7 @@
 *.bin
-emulator/vnsem
+emulator/vns-emu
 assembler/parser.tab.c
 assembler/parser.tab.h
 assembler/scanner.c
-assembler/vnsasm
+assembler/vns-asm
 .*.swp

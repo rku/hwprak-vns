@@ -23,7 +23,8 @@ be built.
   ./vns-emu -s 10 multiply.bin
   ```
 
-The emulator prints a status line for each executed instruction.
+The emulator prints a status line for each executed instruction. It
+represents the machine state *after* the instruction has been executed.
 It looks like this (output taken from the multiply example program):
 
   ```

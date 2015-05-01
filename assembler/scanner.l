@@ -52,11 +52,11 @@ WHITESPACE          [ \s\t\r\f]
 \.(?i:byte)         { return TOK_BYTE; }
 \.(?i:offset)       { return TOK_OFFSET; }
 
-A                   { yylval.ival = AT_REG_A;  return TOK_ARG; }
-L                   { yylval.ival = AT_REG_L;  return TOK_ARG; }
-M                   { yylval.ival = AT_MEM;    return TOK_ARG; }
-FL                  { yylval.ival = AT_REG_FL; return TOK_ARG; }
-SP                  { yylval.ival = AT_REG_SP; return TOK_ARG; }
+(?i:a)              { yylval.ival = AT_REG_A;  return TOK_ARG; }
+(?i:l)              { yylval.ival = AT_REG_L;  return TOK_ARG; }
+(?i:m)              { yylval.ival = AT_MEM;    return TOK_ARG; }
+(?i:fl)             { yylval.ival = AT_REG_FL; return TOK_ARG; }
+(?i:sp)             { yylval.ival = AT_REG_SP; return TOK_ARG; }
 
 (?i:{TEXT})         {
                         yylval.sval = strdup(yytext);

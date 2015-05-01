@@ -1,38 +1,38 @@
 ; init
-MVI L,100
-MVI A,0
-MOV M,A
+mvi l,100
+mvi a,0
+mov m,a
 
 ; input factor1
-IN 0
-MVI L,101
-MOV M,A
+in  0
+mvi l,101
+mov m,a
 
 ; input factor2
-IN 0
-MVI L,102
-MOV M,A
+in  0
+mvi l,102
+mov m,a
 
 ; call multiply function
-CALL mult
-OUT 0
-HLT
+call mult
+out 0
+hlt
 
 ; multiply
-mult: MVI L,102
-MOV A,M
-CPI 0
-JZ end
-DCR A
-MOV M,A
-MVI L,100
-MOV A,M
-MVI L,101
-ADD M
-MVI L,100
-MOV M,A
-JMP mult
+mult: mvi l,102
+mov a,m
+cpi 0
+jz end
+dcr a
+mov m,a
+mvi l,100
+mov a,m
+mvi l,101
+add m
+mvi l,100
+mov m,a
+jmp mult
 end:
-MVI L,100
-MOV A,M
-RET
+mvi l,100
+mov a,m
+ret

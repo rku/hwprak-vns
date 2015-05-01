@@ -185,9 +185,17 @@ void prc_ins(const char *mnemonic,
     ins = is_find_mnemonic(mnemonic, at1, at2);
 
     if (NULL == ins) {
-        util_perror("near line %i: Unknown instruction '%s' "
-                    "or invalid argument types!\n",
-                    yylineno, mnemonic);
+        util_perror("near line %i: ", yylineno);
+        if (is_lookup_mnemonic_name(mnemonic)) {
+            if(at1 == AT_NONE) {
+                util_perror("missing argument for '%s'\n", mnemonic);
+            } else {
+                util_perror("invalid arguments for '%s' (found %x, %x)\n",
+                        mnemonic, at1, at2);
+            }
+        } else {
+            util_perror("Unknown instruction '%s'\n", mnemonic);
+        }
         exit(EXIT_FAILURE);
     }
 

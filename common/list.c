@@ -38,7 +38,7 @@ void list_destroy(list *l)
 
 void list_insert(list *l, list_item *at, void *payload, free_function *f)
 {
-    list_item *new_item = (list_item*)malloc(sizeof(list_item));
+    list_item *new_item = malloc(sizeof(*new_item));
 
     new_item->payload = payload;
     new_item->free_func = f;

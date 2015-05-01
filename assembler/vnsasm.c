@@ -107,7 +107,7 @@ vnsasm_label* declare_label(const char *name, unsigned int addr)
             exit(EXIT_FAILURE);
         }
     } else {
-        label = (vnsasm_label*)malloc(sizeof(vnsasm_label));
+        label = malloc(sizeof(*label));
 
         label->name = strdup(name);
         label->addr = addr;

@@ -212,14 +212,14 @@ void prc_offset(uint8_t offset)
     config.program->counter = offset;
 }
 
-int compile(void)
+int assemble(void)
 {
     if (NULL == (yyin = fopen(config.infile_name, "r"))) {
         perror(config.infile_name);
         return EXIT_FAILURE;
     }
 
-    printf("Compiling %s into %s...\n", 
+    printf("Assembling %s into %s...\n", 
             util_basename(config.infile_name),
             util_basename(config.outfile_name));
 
@@ -246,7 +246,7 @@ void print_usage(char *pname)
     printf("\nUsage: %s [-hvzr] [-o <outfile>] <asmfile>\n\n", pname);
     printf("  -h             Show this help text.\n");
     printf("  -v             Turn on verbose output.\n");
-    printf("  -o <outfile>   Write compiled program to <outfile>.\n");
+    printf("  -o <outfile>   Write assembled program to <outfile>.\n");
     printf("  -z             Do NOT strip trailing zeros.\n");
     printf("  -r             Print resolved label addresses.\n");
     printf("\n");
@@ -258,7 +258,7 @@ int main(int argc, char **argv)
     char *process_name = util_basename(argv[0]);
     vnsasm_program program;
 
-    printf(BANNER_LINE1, "ASM Compiler");
+    printf(BANNER_LINE1, "Assembler");
     printf(BANNER_LINE2, VERSION);
 
     /* initialize program */
@@ -303,5 +303,5 @@ int main(int argc, char **argv)
 
     config.infile_name = strdup(argv[optind]);
 
-    return compile();
+    return assemble();
 }

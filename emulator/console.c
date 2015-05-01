@@ -36,6 +36,7 @@ void console_load(int argc, char **argv, vnsem_machine *machine);
 void console_machine(int argc, char **argv, vnsem_machine *machine);
 void console_memdump(int argc, char **argv, vnsem_machine *machine);
 void console_memset(int argc, char **argv, vnsem_machine *machine);
+void console_pcset(int argc, char **argv, vnsem_machine *machine);
 void console_quit(int argc, char **argv, vnsem_machine *machine);
 void console_reset(int argc, char **argv, vnsem_machine *machine);
 void console_run(int argc, char **argv, vnsem_machine *machine);
@@ -56,8 +57,10 @@ static const console_command console_commands[] = {
                  0, 0,            NULL },
     { "memdump", console_memdump, "Dump memory.",
                  0, 1,            "[<addr>]" },
-    { "memset",  console_memset,  "Set content of a memory cell",
+    { "memset",  console_memset,  "Set content of a memory cell.",
                  2, 2,            "<addr> <value>" },
+    { "pcset",   console_pcset,   "Set the program counter.",
+                 1, 1,            "<addr>" },
     { "quit",    console_quit,    "Quit the emulator.",
                  0, 0,            NULL },
     { "reset",   console_reset,   "Reset (parts of) the machine.",
@@ -249,6 +252,18 @@ void console_memset(int argc, char **argv, vnsem_machine *machine)
 
     machine->mem[a] = v;
     printf(" 0x%.2x   0x%.2x (%i)\n", a, v, v);
+}
+
+void console_pcset(int argc, char **argv, vnsem_machine *machine)
+{
+    uint8_t a = 0;
+
+    if (!util_strtouint8(argv[1], &a)) {
+        util_perror("Invalid address: %s\n", argv[1]);
+        return;
+    }
+
+    machine->pc = a;
 }
 
 void console_quit(int argc, char **argv, vnsem_machine *machine)

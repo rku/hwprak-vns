@@ -89,6 +89,10 @@ state of the machine and memory.
 
   Set the memory cell at address `<addr>` to `<value>`.
 
+* `pcset <addr>`
+
+  Set the program counter to `<addr>`.
+
 * `reset pc|mem|all`
 
   Reset the program counter (pc), memory (mem) or both (all).

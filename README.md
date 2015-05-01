@@ -12,8 +12,11 @@ In order to build the assembler and emulator, just type:
 make
 ```
 
-This software requires gnu bison/flex and libreadline to
-be built.
+This software requires gnu bison/flex and libreadline to be built.
+It has been developed and tested with Linux. However, OSX comes with
+all dependencies in its developer tools package and should build
+everything without problems. Windows has not been tested yet but
+should work as well with cygwin.
 
 
 ## Example usage

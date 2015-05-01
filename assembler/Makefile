@@ -14,7 +14,7 @@ vnsasm: vnsasm.c vnsasm.h scanner.c parser.tab.c \
 	$(CC) -o $@ $(filter %c, $^) $(CFLAGS) $(LIBS)
 
 scanner.c: scanner.l parser.tab.h
-	$(LEX) -o $@ $< $(FLEXARGS)
+	$(LEX) $(LFLAGS) -o $@ $<
 
 parser.tab.h: parser.y
 	$(BISON) $(BFLAGS) $<

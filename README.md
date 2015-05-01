@@ -8,7 +8,7 @@ If you do not know what this is for, you probably do not need it.
 
 In order to build the assembler and emulator, just type:
 
-```
+```Shell
 make
 ```
 
@@ -18,7 +18,7 @@ be built.
 
 ## Example usage
 
-  ```
+  ```Shell
   vnsasm -o multiply.bin examples/multiply.asm
   vnsem -s 10 multiply.bin
   ```
@@ -46,49 +46,49 @@ prefixed with '0x'):
 
 The assembler is case insensitive.
 
-* IN <port>
+* `in <port>`
 
   Requests input for port <port> from user and stores it
   in the accumulator.
 
-* OUT <port>
+* `out <port>`
 
   Prints content of accumulator to stdout.
 
-* .offset <offset>
+* `.offset <offset>`
   
   Sets address offset for the following code to <offset>.
 
   Example:
 
-     ```
-     JMP 0x10           ; jump to address 0x10
+     ```Assembly
+     jmp 0x10           ; jump to address 0x10
      .offset 0x10       ; set code offset to 0x10
-     HLT                ; halt
+     hlt                ; halt
      ```
 
-* <label>:
+* `<label>:`
   
   Declares a label. Note that labels are case sensitive.
 
   Example:
 
-     ```
-     JMP foo            ; jump to address labeled 'fooÄ
+     ```Assembly
+     jmp foo            ; jump to address labeled 'fooÄ
      foo2:              ; declare label 'foo2'
-     RET                ; return
-     foo: CALL foo2     ; declare label 'foo' and jump to
+     ret                ; return
+     foo: call foo2     ; declare label 'foo' and jump to
                         ; address labeled 'foo2'
-     HLT                ; halt
+     hlt                ; halt
      ```
 
-* .byte <value> [, <value2> [, ...]]
+* `.byte <value> [, <value2> [, ...]]`
 
-  Set byte at current position to <value>.
+  Set byte(s) at current position to <value>.
 
   Example:
 
-     ```
+     ```Assembly
      .offset 0x50
      .byte 4, 25, 42, 58
      ```

@@ -60,7 +60,9 @@ void list_insert(list *l, list_item *at, void *payload, free_function *f)
 
 void list_remove(list *l, list_item *item)
 {
-    if (NULL != item->prev) {
+    if (NULL == item->prev) {
+        l->head = item->next;
+    } else {
         item->prev->next = item->next;
         item->next->prev = item->prev;
     }

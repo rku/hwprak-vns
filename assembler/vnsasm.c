@@ -90,6 +90,12 @@ vnsasm_label *find_label(const char *name)
     return NULL;
 }
 
+void free_label(void *label)
+{
+    free(((vnsasm_label*)label)->name);
+    free(label);
+}
+
 vnsasm_label* declare_label(const char *name, unsigned int addr)
 {
     vnsasm_label *label;
@@ -117,7 +123,7 @@ vnsasm_label* declare_label(const char *name, unsigned int addr)
             list_init(&label->positions);
         }
 
-        list_insert(&config.program->labels, NULL, label, free);
+        list_insert(&config.program->labels, NULL, label, free_label);
     }
 
     return label;
@@ -241,7 +247,7 @@ int assemble(void)
 
     write_program();
 
-    list_destroy(&config.program->labels);
+    list_destroy(&(config.program->labels));
     fclose(yyin);
 
     printf("Finished.\n");

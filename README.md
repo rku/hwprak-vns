@@ -31,7 +31,7 @@ represents the machine state *after* the instruction has been executed.
 It looks like this (output taken from the multiply example program):
 
   ```
-  #1026  [ ACCU=0xca  L=0xca  PC=0x17  SP=0x00 ]  C:*  Z:.  S:*
+  #1026  [ ACCU=0xca  L=0xca  PC=0x17  SP=0x00 ]  C:*  Z:-  S:*
   ```
 
 The fields have the following meanings (hexadezimal values are
@@ -44,7 +44,7 @@ prefixed with '0x'):
 * SP=0x00       the stack pointer is loaded with 0x00
 
 **C**, **Z** and **S** show the state of the **C**arry, **Z**ero and
-**S**ign flags respectively where '*' means 1 and '.' means 0.
+**S**ign flags respectively where '*' means set and '-' means unset.
 
 ## Notes on the emulator
 

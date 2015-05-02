@@ -41,9 +41,9 @@ void print_machine_state(vnsem_machine *machine)
             machine->pc,
             machine->sp);
     printf("C:%c  Z:%c  S:%c\n",
-            (machine->flags & F_CARRY) ? '*' : '.',
-            (machine->flags & F_ZERO)  ? '*' : '.',
-            (machine->flags & F_SIGN)  ? '*' : '.');
+            (machine->flags & F_CARRY) ? '*' : '-',
+            (machine->flags & F_ZERO)  ? '*' : '-',
+            (machine->flags & F_SIGN)  ? '*' : '-');
 }
 
 void print_key(void)

@@ -39,7 +39,6 @@ typedef struct _vnsasm_program {
 typedef struct _vnsasm_configuration {
     char *outfile_name;
     char *infile_name;
-    uint8_t verbose_mode;
     uint8_t strip_trailing_zeros;
     uint8_t print_resolved_labels;
     vnsasm_program *program;

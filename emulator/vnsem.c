@@ -392,9 +392,8 @@ int emulate(void)
 
 void print_usage(char *pname)
 {
-    printf("\nUsage: %s [-h] | [-v] [-i] [-s <ms>] [<program>]\n\n", pname);
+    printf("\nUsage: %s [-h] | [-i] [-s <ms>] [<program>]\n\n", pname);
     printf("  -h         Show this help text.\n");
-    printf("  -v         Turn on verbose output.\n");
     printf("  -i         Enter console mode at startup.\n");
     printf("  -s <ms>    Set step time to <ms> milliseconds.\n");
     printf("\n");
@@ -409,7 +408,6 @@ int main(int argc, char **argv)
     printf(BANNER_LINE2, VERSION);
 
     config.interactive_mode = FALSE;
-    config.verbose_mode = FALSE;
     config.step_time_ms = 0;
     config.infile_name = NULL;
 
@@ -418,9 +416,6 @@ int main(int argc, char **argv)
             case 'h':
                 print_usage(process_name);
                 return EXIT_SUCCESS;
-            case 'v':
-                config.verbose_mode = TRUE;
-                break;
             case 's':
                 config.step_time_ms = strtol(optarg, &p, 10);
                 if (!optarg || *p) {

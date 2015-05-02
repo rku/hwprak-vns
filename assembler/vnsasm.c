@@ -257,9 +257,8 @@ int assemble(void)
 
 void print_usage(char *pname)
 {
-    printf("\nUsage: %s [-hvzr] [-o <outfile>] <asmfile>\n\n", pname);
+    printf("\nUsage: %s [-hzr] [-o <outfile>] <asmfile>\n\n", pname);
     printf("  -h             Show this help text.\n");
-    printf("  -v             Turn on verbose output.\n");
     printf("  -o <outfile>   Write assembled program to <outfile>.\n");
     printf("  -z             Do NOT strip trailing zeros.\n");
     printf("  -r             Print resolved label addresses.\n");
@@ -281,7 +280,6 @@ int main(int argc, char **argv)
     /* initialize default configuration */
     config.outfile_name = "program.bin";
     config.infile_name = NULL;
-    config.verbose_mode = FALSE;
     config.strip_trailing_zeros = TRUE;
     config.print_resolved_labels = FALSE;
     config.program = &program;
@@ -292,9 +290,6 @@ int main(int argc, char **argv)
             case 'h':
                 print_usage(process_name);
                 return EXIT_SUCCESS;
-            case 'v':
-                config.verbose_mode = TRUE;
-                break;
             case 'o':
                 config.outfile_name = strdup(optarg);
                 break;

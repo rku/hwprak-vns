@@ -117,20 +117,25 @@ The interactive console supports tab completion and a command history.
 
 ## Notes on the assembler
 
-The assembler is case insensitive.
+The assembler is case insensitive and supports the instructionset as
+documented in the manual you get for preparing your experiments. It
+supports some additional convenience features and directives:
 
 * `in <port>`
 
-  Requests input for port <port> from user and stores it
-  in the accumulator.
+  Requests input for port `<port>` from user and stores it in the
+  accumulator. The port value ist not used at the moment. You can
+  simply pass `0`. See the multiply example for a use case.
 
 * `out <port>`
 
-  Prints content of accumulator to stdout.
+  Prints content of accumulator to stdout. The port value is not
+  used at the moment. You can simply pass a `0`. See the multiply
+  example for a use case.
 
 * `.offset <offset>`
   
-  Sets address offset for the following code to <offset>.
+  Sets address offset for the following code to `<offset>`.
 
   Example:
 
@@ -157,7 +162,9 @@ The assembler is case insensitive.
 
 * `.byte <value> [, <value2> [, ...]]`
 
-  Set byte(s) at current position to <value>.
+  Set byte(s) at current position to `<value>`. If a comma separated
+  list of values is passed, they will be written to the next consecutive
+  bytes.
 
   Example:
 

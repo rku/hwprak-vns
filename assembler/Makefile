@@ -7,7 +7,7 @@ BFLAGS=-d
 LEX=flex
 LFLAGS=
 
-vns-asm: vnsasm.c vnsasm.h scanner.c parser.tab.c \
+vnsasm: vnsasm.c vnsasm.h scanner.c parser.tab.c \
 		../common/utils.c ../common/utils.h ../common/globals.h \
 		../common/instructionset.c ../common/instructionset.h \
 		../common/list.c ../common/list.h
@@ -22,4 +22,4 @@ parser.tab.h: parser.y
 parser.tab.c: parser.tab.h
 
 clean:
-	@rm -f *.o scanner.c parser.tab.* parser.dot vns-asm
+	@rm -f *.o scanner.c parser.tab.* parser.dot vnsasm

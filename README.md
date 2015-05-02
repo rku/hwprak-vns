@@ -22,8 +22,8 @@ should work as well with cygwin.
 ## Example usage
 
   ```Shell
-  ./vns-asm -o multiply.bin examples/multiply.asm
-  ./vns-emu -s 10 multiply.bin
+  vnsasm -o multiply.bin examples/multiply.asm
+  vnsem -s 10 multiply.bin
   ```
 
 The emulator prints a status line for each executed instruction. It

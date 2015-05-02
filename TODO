@@ -3,3 +3,4 @@ Things to do (list is not intended to be complete):
  * handle malloc errors
  * clean-up/improve emulator output
  * make parser reentrant
+ * add install target to Makefile for the brave

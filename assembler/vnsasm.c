@@ -237,7 +237,7 @@ int assemble(void)
             util_basename(config.infile_name),
             util_basename(config.outfile_name));
 
-    list_init(&config.program->labels);
+    list_init(&(config.program->labels));
 
     if (0 != yyparse()) {
         return EXIT_FAILURE;

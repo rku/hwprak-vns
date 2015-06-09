@@ -152,7 +152,7 @@ supports some additional convenience features and directives:
   Example:
 
      ```Assembly
-     jmp foo            ; jump to address labeled 'fooÄ
+     jmp foo            ; jump to address labeled 'foo'
      foo2:              ; declare label 'foo2'
      ret                ; return
      foo: call foo2     ; declare label 'foo' and jump to

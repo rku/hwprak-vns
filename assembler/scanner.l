@@ -49,7 +49,7 @@ WHITESPACE          [[:space:]]
 
 {SINGLE}            { return yytext[0];  }
 {COMMENT}           { return TOK_NEWL;   }
-\.(?i:byte)         { return TOK_BYTE; }
+\.(?i:byte)         { return TOK_BYTE;   }
 \.(?i:offset)       { return TOK_OFFSET; }
 
 (?i:a)              { yylval.ival = AT_REG_A;  return TOK_ARG; }

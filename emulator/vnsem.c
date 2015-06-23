@@ -370,21 +370,23 @@ int emulate(void)
         machine.step_count++;
 
         switch (process_instruction(next_ins, &machine)) {
-            case 0: break;
+            case 0:
+                print_machine_state(&machine);
+                usleep(config.step_time_ms * 1000);
+                break;
             case ERR_ILLEGAL_INSTRUCTION:
                 util_perror("Unknown instruction 0x%.2X "
                             "at address 0x%.2X.\n",
                             next_ins, machine.pc - 1);
-                console(&machine);
+                machine.halted = TRUE;
+                break;
             default:
                 util_perror("Could not execute instruction 0x%.2X "
                             "at address 0x%.2X for unknown reason.\n",
                             next_ins, machine.pc - 1);
-                console(&machine);
+                machine.halted = TRUE;
+                break;
         }
-
-        print_machine_state(&machine);
-        usleep(config.step_time_ms * 1000);
     }
 
     return EXIT_SUCCESS;

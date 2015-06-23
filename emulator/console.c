@@ -132,7 +132,7 @@ void console_break(int argc, char **argv, vnsem_machine *machine)
 
     if (argc == 1) {
         if (machine->break_enabled) {
-            printf("Current break point at address 0x%.2x.\n",
+            printf("Current break point at address 0x%.2X.\n",
                     machine->break_point);
         } else {
             printf("No breakpoint set.\n");
@@ -154,7 +154,7 @@ void console_break(int argc, char **argv, vnsem_machine *machine)
 
     machine->break_point = addr;
     machine->break_enabled = TRUE;
-    printf("Break point set at address 0x%.2x\n", addr);
+    printf("Break point set at address 0x%.2X\n", addr);
 }
 
 void console_help(int argc, char **argv, vnsem_machine *machine)
@@ -203,12 +203,12 @@ void console_machine(int argc, char **argv, vnsem_machine *machine)
 {
     printf("\n  ** Machine information **\n\n");
     printf("           Memory: (-> memdump)\n");
-    printf("  Program counter: 0x%.2x\n", machine->pc);
-    printf("    Stack pointer: 0x%.2x\n", machine->sp);
+    printf("  Program counter: 0x%.2X\n", machine->pc);
+    printf("    Stack pointer: 0x%.2X\n", machine->sp);
     printf("     Step counter: %i (since reset)\n", machine->step_count);
-    printf("      Accumulator: 0x%.2x (%i)\n",
+    printf("      Accumulator: 0x%.2X (%i)\n",
             machine->accu, machine->accu);
-    printf("                L: 0x%.2x (%i)\n",
+    printf("                L: 0x%.2X (%i)\n",
             machine->reg_l, machine->reg_l);
     printf("       Carry flag: %s\n",
             (machine->flags & F_CARRY) ? "set" : "unset");
@@ -229,7 +229,7 @@ void console_memdump(int argc, char **argv, vnsem_machine *machine)
             return;
         }
 
-        printf(" 0x%.2x   0x%.2x (%i)\n",
+        printf(" 0x%.2X   0x%.2X (%i)\n",
                 addr, machine->mem[addr], machine->mem[addr]);
         return;
     }
@@ -252,7 +252,7 @@ void console_memset(int argc, char **argv, vnsem_machine *machine)
     }
 
     machine->mem[a] = v;
-    printf(" 0x%.2x   0x%.2x (%i)\n", a, v, v);
+    printf(" 0x%.2X   0x%.2X (%i)\n", a, v, v);
 }
 
 void console_pcset(int argc, char **argv, vnsem_machine *machine)
@@ -281,7 +281,7 @@ void console_reset(int argc, char **argv, vnsem_machine *machine)
     if (!strncasecmp("pc", argv[1], 2)) {
         machine->pc = 0;
         machine->step_count = 0;
-        printf("Program counter has been reset to 0x%.2x.\n", machine->pc);
+        printf("Program counter has been reset to 0x%.2X.\n", machine->pc);
     } else
     if (!strncasecmp("all", argv[1], 3)) {
         reset_machine(machine);

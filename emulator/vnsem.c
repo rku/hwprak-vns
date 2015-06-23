@@ -35,7 +35,7 @@ vnsem_configuration config;
 void print_machine_state(vnsem_machine *machine)
 {
     printf("#%.3i  ", machine->step_count);
-    printf("[ ACCU=0x%.2x  L=0x%.2x  PC=0x%.2x  SP=0x%.2x ]  ",
+    printf("[ ACCU=0x%.2X  L=0x%.2X  PC=0x%.2X  SP=0x%.2X ]  ",
             machine->accu,
             machine->reg_l,
             machine->pc,
@@ -67,16 +67,16 @@ void dump_memory(vnsem_machine *machine)
     printf(" 0x00   ");
     for (i = 0; i <= 256; ++i) {
         if (i > 0 && !(i % 16)) {
-            printf("  0x%.2x ", i - 1);
+            printf("  0x%.2X ", i - 1);
             /* row marker */
             if (line == (floor(machine->pc / 16.0))) {
                 printf("<");
             }
             ++line;
             if (line >= 16) break;
-            printf("\n 0x%.2x   ", i);
+            printf("\n 0x%.2X   ", i);
         }
-        printf("%.2x ", machine->mem[i]);
+        printf("%.2X ", machine->mem[i]);
     }
     printf("\n\n");
 }
@@ -211,7 +211,7 @@ void console(vnsem_machine *machine) {
 
 void user_output(uint8_t port, vnsem_machine *machine)
 {
-    printf("[%.2x] Program output => 0x%x (%i)\n",
+    printf("[%.2X] Program output => 0x%X (%i)\n",
             port, machine->accu, machine->accu);
 }
 
@@ -221,7 +221,7 @@ void user_input(uint8_t port, vnsem_machine *machine)
     uint16_t value;
     char prompt[32], *input;
 
-    snprintf((char*)&prompt, 32, "[%.2x] Program input => ", port);
+    snprintf((char*)&prompt, 32, "[%.2X] Program input => ", port);
 
     while (1) {
         set_block_sigint(FALSE);
@@ -356,7 +356,7 @@ int emulate(void)
 
         /* check if we have reached a breakpoint */
         if (machine.break_enabled && machine.pc == machine.break_point) {
-            printf("Break point 0x%.2x reached.\n", machine.break_point);
+            printf("Break point 0x%.2X reached.\n", machine.break_point);
             machine.halted = TRUE;
         }
 
@@ -372,13 +372,13 @@ int emulate(void)
         switch (process_instruction(next_ins, &machine)) {
             case 0: break;
             case ERR_ILLEGAL_INSTRUCTION:
-                util_perror("Unknown instruction 0x%.2x "
-                            "at address 0x%.2x.\n",
+                util_perror("Unknown instruction 0x%.2X "
+                            "at address 0x%.2X.\n",
                             next_ins, machine.pc - 1);
                 console(&machine);
             default:
-                util_perror("Could not execute instruction 0x%.2x "
-                            "at address 0x%.2x for unknown reason.\n",
+                util_perror("Could not execute instruction 0x%.2X "
+                            "at address 0x%.2X for unknown reason.\n",
                             next_ins, machine.pc - 1);
                 console(&machine);
         }

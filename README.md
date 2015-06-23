@@ -31,15 +31,15 @@ represents the machine state *after* the instruction has been executed.
 It looks like this (output taken from the multiply example program):
 
   ```
-  #1026  [ ACCU=0xca  L=0xca  PC=0x17  SP=0x00 ]  C:*  Z:-  S:*
+  #1026  [ ACCU=0xCA  L=0xCA  PC=0x17  SP=0x00 ]  C:*  Z:-  S:*
   ```
 
 The fields have the following meanings (hexadezimal values are
 prefixed with '0x'):
 
 * #1026         current step count
-* ACCU=0xca     the accu register is loaded with 0xca
-* L=0xca        the L register is loaded with 0xca
+* ACCU=0xCA     the accu register is loaded with 0xCA
+* L=0xCA        the L register is loaded with 0xCA
 * PC=0x17       the program counter is loaded with 0x17
 * SP=0x00       the stack pointer is loaded with 0x00
 

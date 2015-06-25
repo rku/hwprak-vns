@@ -103,7 +103,7 @@ state of the machine and memory.
 
 * `run`
 
-  Start executation from the current position of the program counter.
+  Start execution from current position of the program counter.
 
 * `step`
 

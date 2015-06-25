@@ -1,4 +1,4 @@
-.PHONY: vnsasm vnsem all
+.PHONY: vnsasm vnsem tests all
 
 all: vnsasm vnsem
 
@@ -8,6 +8,11 @@ vnsasm:
 vnsem:
 	@make -C emulator
 
+tests:
+	@make -C tests
+	@make -C tests run-tests
+
 clean:
 	@make -C assembler clean
 	@make -C emulator clean
+	@make -C tests clean

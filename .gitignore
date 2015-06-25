@@ -4,4 +4,7 @@ assembler/parser.tab.c
 assembler/parser.tab.h
 assembler/scanner.c
 assembler/vnsasm
+tests/tests
+tests/*.a
+tests/*.o
 .*.swp

@@ -21,6 +21,7 @@
 #include <string.h>
 
 #include "unittest.h"
+#include "globals.h"
 #include "vnsem.h"
 
 unsigned int tests_run = 0;
@@ -565,9 +566,508 @@ TEST(test_ins_cpi_n)
     return TEST_OK;
 }
 
+TEST(test_ins_ana_a)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 23;
+
+    vnsem_machine m2 = _get_machine(&m1);
+
+    process_instruction(0xa7, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "ANA A instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_ana_l)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 23;
+    m1.reg_l = 12;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.accu = 23 & 12;
+
+    process_instruction(0xa5, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "ANA L instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_ana_m)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 23;
+    m1.reg_l = 42;
+    m1.mem[42] = 21;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.accu = 23 & 21;
+
+    process_instruction(0xa6, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "ANA M instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_ani_n)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 42;
+    m1.mem[0] = 23;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.pc++;
+    m2.accu = 42 & 23;
+
+    process_instruction(0xe6, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "ANI n instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_ora_a)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 23;
+
+    vnsem_machine m2 = _get_machine(&m1);
+
+    process_instruction(0xb7, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "ORA A instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_ora_l)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 23;
+    m1.reg_l = 32;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.accu = 23 | 32;
+
+    process_instruction(0xb5, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "ORA L instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_ora_m)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 23;
+    m1.reg_l = 42;
+    m1.mem[42] = 21;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.accu = 23 | 21;
+
+    process_instruction(0xb6, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "ORA M instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_ori_n)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 42;
+    m1.mem[0] = 23;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.pc++;
+    m2.accu = 42 | 23;
+
+    process_instruction(0xf6, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "ORI n instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_xra_a)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 23;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.accu = 0;
+    m2.flags = F_ZERO;
+
+    process_instruction(0xaf, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "XRA A instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_xra_l)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 23;
+    m1.reg_l = 32;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.accu = 23 ^ 32;
+
+    process_instruction(0xad, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "XRA L instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_xra_m)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 23;
+    m1.reg_l = 42;
+    m1.mem[42] = 21;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.accu = 23 ^ 21;
+
+    process_instruction(0xae, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "XRA M instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_xri_n)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.accu = 42;
+    m1.mem[0] = 23;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.pc++;
+    m2.accu = 42 ^ 23;
+
+    process_instruction(0xee, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "XRI n instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_jmp_adr)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.mem[0] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.pc = 0xaf;
+
+    process_instruction(0xc3, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "JMP adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_jz_adr)
+{
+    // true
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.flags = F_ZERO;
+    m1.mem[0] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.pc++;
+    m2.pc = 0xaf;
+
+    // false
+    vnsem_machine m3 = _get_machine(&m1);
+    m3.flags = F_NONE;
+
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.pc++;
+
+    process_instruction(0xca, &m1);
+    process_instruction(0xca, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "JZ adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_jnz_adr)
+{
+    // true
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.mem[0] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.pc = 0xaf;
+
+    // false
+    vnsem_machine m3 = _get_machine(&m1);
+    m3.flags = F_ZERO;
+
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.pc++;
+
+    process_instruction(0xc2, &m1);
+    process_instruction(0xc2, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "JNZ adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_jc_adr)
+{
+    // true
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.flags = F_CARRY;
+    m1.mem[0] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.pc = 0xaf;
+
+    // false
+    vnsem_machine m3 = _get_machine(&m1);
+    m3.flags = F_NONE;
+
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.pc++;
+
+    process_instruction(0xda, &m1);
+    process_instruction(0xda, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "JC adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_jnc_adr)
+{
+    // true
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.mem[0] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.pc = 0xaf;
+
+    // false
+    vnsem_machine m3 = _get_machine(&m1);
+    m3.flags = F_CARRY;
+
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.pc++;
+
+    process_instruction(0xd2, &m1);
+    process_instruction(0xd2, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "JNC adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_call_adr)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.pc = 0xa;
+    m1.mem[m1.pc] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.sp = 0xff;
+    m2.mem[m2.sp] = 0xb;
+    m2.pc = 0xaf;
+
+    process_instruction(0xcd, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "CALL adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_cz_adr)
+{
+    // true
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.flags = F_ZERO;
+    m1.pc = 0xa;
+    m1.mem[m1.pc] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.sp = 0xff;
+    m2.mem[m2.sp] = 0xb;
+    m2.pc = 0xaf;
+
+    // false
+    vnsem_machine m3 = _get_machine(&m1);
+    m3.flags = F_NONE;
+
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.pc++;
+
+    process_instruction(0xcc, &m1);
+    process_instruction(0xcc, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "CZ adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_cnz_adr)
+{
+    // true
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.pc = 0xa;
+    m1.mem[m1.pc] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.sp = 0xff;
+    m2.mem[m2.sp] = 0xb;
+    m2.pc = 0xaf;
+
+    // false
+    vnsem_machine m3 = _get_machine(&m1);
+    m3.flags = F_ZERO;
+
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.pc++;
+
+    process_instruction(0xc4, &m1);
+    process_instruction(0xc4, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "CNZ adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_cc_adr)
+{
+    // true
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.flags = F_CARRY;
+    m1.pc = 0xa;
+    m1.mem[m1.pc] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.sp = 0xff;
+    m2.mem[m2.sp] = 0xb;
+    m2.pc = 0xaf;
+
+    // false
+    vnsem_machine m3 = _get_machine(&m1);
+    m3.flags = F_NONE;
+
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.pc++;
+
+    process_instruction(0xdc, &m1);
+    process_instruction(0xdc, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "CC adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_cnc_adr)
+{
+    // true
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.pc = 0xa;
+    m1.mem[m1.pc] = 0xaf;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.sp = 0xff;
+    m2.mem[m2.sp] = 0xb;
+    m2.pc = 0xaf;
+
+    // false
+    vnsem_machine m3 = _get_machine(&m1);
+    m3.flags = F_CARRY;
+
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.pc++;
+
+    process_instruction(0xd4, &m1);
+    process_instruction(0xd4, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "CNC adr instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_ret)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+    m1.sp = 0xff;
+    m1.mem[m1.sp] = 0xa;
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.pc = 0xa;
+    m2.sp = 0x0;
+
+    process_instruction(0xc9, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "RET instruction failed!");
+
+    return TEST_OK;
+}
+
+TEST(test_ins_hlt)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+
+    vnsem_machine m2 = _get_machine(&m1);
+    m2.halted = TRUE;
+
+    process_instruction(0x76, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "HLT instruction failed!");
+
+    return TEST_OK;
+}
+
+
+TEST(test_ins_nop)
+{
+    vnsem_machine m1 = _get_machine(NULL);
+
+    vnsem_machine m2 = _get_machine(&m1);
+
+    process_instruction(0x00, &m1);
+
+    ASSERT(MACHINES_EQUAL(m1, m2), "NOP instruction failed!");
+
+    return TEST_OK;
+}
+
+
 /* ------------------------------------------------------------------------ */
 
-char *run_tests(void) {
+char *run_tests(void)
+{
     RUN_TEST(test_ins_mov_a_l);
     RUN_TEST(test_ins_mov_a_m);
     RUN_TEST(test_ins_mov_m_a);
@@ -600,6 +1100,31 @@ char *run_tests(void) {
     RUN_TEST(test_ins_cmp_l);
     RUN_TEST(test_ins_cmp_m);
     RUN_TEST(test_ins_cpi_n);
+    RUN_TEST(test_ins_ana_a);
+    RUN_TEST(test_ins_ana_l);
+    RUN_TEST(test_ins_ana_m);
+    RUN_TEST(test_ins_ani_n);
+    RUN_TEST(test_ins_ora_a);
+    RUN_TEST(test_ins_ora_l);
+    RUN_TEST(test_ins_ora_m);
+    RUN_TEST(test_ins_ori_n);
+    RUN_TEST(test_ins_xra_a);
+    RUN_TEST(test_ins_xra_l);
+    RUN_TEST(test_ins_xra_m);
+    RUN_TEST(test_ins_xri_n);
+    RUN_TEST(test_ins_jmp_adr);
+    RUN_TEST(test_ins_jz_adr);
+    RUN_TEST(test_ins_jnz_adr);
+    RUN_TEST(test_ins_jc_adr);
+    RUN_TEST(test_ins_jnc_adr);
+    RUN_TEST(test_ins_call_adr);
+    RUN_TEST(test_ins_cz_adr);
+    RUN_TEST(test_ins_cnz_adr);
+    RUN_TEST(test_ins_cc_adr);
+    RUN_TEST(test_ins_cnc_adr);
+    RUN_TEST(test_ins_ret);
+    RUN_TEST(test_ins_hlt);
+    RUN_TEST(test_ins_nop);
 
     return NULL;
 }

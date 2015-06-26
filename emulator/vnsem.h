@@ -49,6 +49,7 @@ typedef struct _vnsem_machine {
     uint8_t flags;
 } vnsem_machine;
 
+#define F_NONE  0x0
 #define F_CARRY 0x1
 #define F_ZERO  0x2
 #define F_SIGN  0x4

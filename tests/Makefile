@@ -4,7 +4,7 @@ LDFLAGS=-L. -ltestobjs
 AR=ar
 STRIP=strip
 
-all: libtestobjs.a tests
+all: libtestobjs.a emulator-tests
 
 libtestobjs.a: vnsem.o
 	$(AR) cq $@ vnsem.o
@@ -13,11 +13,12 @@ vnsem.o: ../emulator/vnsem.c
 	$(CC) -c $< $(CFLAGS)
 	$(STRIP) -N main $@
 
-tests: emulator_tests.c unittest.h
+emulator-tests: emulator-tests.c unittest.h
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
-run-tests: tests
-	@./tests
+run-tests: emulator-tests
+	@echo '*** Running emulator tests ***'
+	@./emulator-tests
 
 clean:
 	@rm -f *.o libtestobjs.a tests

@@ -45,6 +45,9 @@ inline vnsem_machine _get_machine(vnsem_machine *other)
 }
 
 #define MACHINES_EQUAL(x, y) (memcmp(&x, &y, sizeof(vnsem_machine)) == 0)
+/* #define P(x,y) do { \
+   print_machine_state(&x); \
+   print_machine_state(&y); } while(0); */
 
 /* ------------------------------------------------------------------------
  *                            test instructions
@@ -503,6 +506,7 @@ TEST(test_ins_sui_n)
 
 TEST(test_ins_cmp_a)
 {
+    // ==
     vnsem_machine m1 = _get_machine(NULL);
     m1.accu = 42;
 
@@ -518,6 +522,7 @@ TEST(test_ins_cmp_a)
 
 TEST(test_ins_cmp_l)
 {
+    // A < L
     vnsem_machine m1 = _get_machine(NULL);
     m1.accu = 19;
     m1.reg_l = 23;
@@ -525,15 +530,37 @@ TEST(test_ins_cmp_l)
     vnsem_machine m2 = _get_machine(&m1);
     m2.flags = F_SIGN | F_CARRY;
 
-    process_instruction(0xbd, &m1);
+    // A == L
+    vnsem_machine m3 = _get_machine(NULL);
+    m3.accu = 23;
+    m3.reg_l = 23;
 
-    ASSERT(MACHINES_EQUAL(m1, m2), "CMP L instruction failed!");
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.flags = F_ZERO;
+
+    // A > L
+    vnsem_machine m5 = _get_machine(NULL);
+    m5.accu = 23;
+    m5.reg_l = 19;
+
+    vnsem_machine m6 = _get_machine(&m5);
+    m6.flags = F_NONE;
+
+    process_instruction(0xbd, &m1);
+    process_instruction(0xbd, &m3);
+    process_instruction(0xbd, &m5);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4) &&
+           MACHINES_EQUAL(m5, m6),
+           "CMP L instruction failed!");
 
     return TEST_OK;
 }
 
 TEST(test_ins_cmp_m)
 {
+    // A < M
     vnsem_machine m1 = _get_machine(NULL);
     m1.accu = 19;
     m1.reg_l = 23;
@@ -542,15 +569,39 @@ TEST(test_ins_cmp_m)
     vnsem_machine m2 = _get_machine(&m1);
     m2.flags = F_SIGN | F_CARRY;
 
-    process_instruction(0xbe, &m1);
+    // A == M
+    vnsem_machine m3 = _get_machine(NULL);
+    m3.accu = 23;
+    m3.reg_l = 42;
+    m3.mem[m3.reg_l] = 23;
 
-    ASSERT(MACHINES_EQUAL(m1, m2), "CMP M instruction failed!");
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.flags = F_ZERO;
+
+    // A > M
+    vnsem_machine m5 = _get_machine(NULL);
+    m5.accu = 42;
+    m5.reg_l = 23;
+    m5.mem[m5.reg_l] = 23;
+
+    vnsem_machine m6 = _get_machine(&m5);
+    m6.flags = F_NONE;
+
+    process_instruction(0xbe, &m1);
+    process_instruction(0xbe, &m3);
+    process_instruction(0xbe, &m5);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4) &&
+           MACHINES_EQUAL(m5, m6),
+           "CMP M instruction failed!");
 
     return TEST_OK;
 }
 
 TEST(test_ins_cpi_n)
 {
+    // A < n
     vnsem_machine m1 = _get_machine(NULL);
     m1.accu = 23;
     m1.mem[0] = 42;
@@ -559,9 +610,32 @@ TEST(test_ins_cpi_n)
     m2.pc++;
     m2.flags = F_SIGN | F_CARRY;
 
-    process_instruction(0xfe, &m1);
+    // A == n
+    vnsem_machine m3 = _get_machine(NULL);
+    m3.accu = 42;
+    m3.mem[0] = 42;
 
-    ASSERT(MACHINES_EQUAL(m1, m2), "CPI n instruction failed!");
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.pc++;
+    m4.flags = F_ZERO;
+
+    // A > n
+    vnsem_machine m5 = _get_machine(NULL);
+    m5.accu = 42;
+    m5.mem[0] = 23;
+
+    vnsem_machine m6 = _get_machine(&m5);
+    m6.pc++;
+    m6.flags = F_NONE;
+
+    process_instruction(0xfe, &m1);
+    process_instruction(0xfe, &m3);
+    process_instruction(0xfe, &m5);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4) &&
+           MACHINES_EQUAL(m5, m6),
+           "CPI n instruction failed!");
 
     return TEST_OK;
 }

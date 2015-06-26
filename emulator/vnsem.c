@@ -28,13 +28,14 @@
 #include "globals.h"
 #include "utils.h"
 #include "console.h"
+#include "instructionset.h"
 #include "vnsem.h"
 
 vnsem_configuration config;
 
 void print_machine_state(vnsem_machine *machine)
 {
-    printf("#%.3i  ", machine->step_count);
+    printf("#%.5i  ", machine->step_count);
     printf("[ ACCU=0x%.2X  L=0x%.2X  PC=0x%.2X  SP=0x%.2X ]  ",
             machine->accu,
             machine->reg_l,
@@ -79,6 +80,48 @@ void dump_memory(vnsem_machine *machine)
         printf("%.2X ", machine->mem[i]);
     }
     printf("\n\n");
+}
+
+void print_instruction_arg(vnsem_machine *machine, argtype at)
+{
+    if (at & AT_REG_A) {
+        printf("A");
+    } else
+    if (at & AT_REG_L) {
+        printf("L");
+    } else
+    if (at & AT_REG_FL) {
+        printf("FL");
+    } else
+    if (at & AT_REG_SP) {
+        printf("SP");
+    } else
+    if (at & AT_MEM) {
+        printf("0x%.2X", machine->mem[machine->reg_l]);
+    } else
+    if (at & AT_LABEL || at & AT_ADDR || at & AT_INT) {
+        printf("0x%.2X", machine->mem[(uint8_t)(machine->pc + 1)]);
+    }
+}
+
+void print_instruction(vnsem_machine *machine)
+{
+    vns_instruction *ins = is_find_opcode(machine->mem[machine->pc]);
+
+    printf("                                                                ");
+    if (ins) {
+        printf("%s", ins->mnemonic);
+        if (ins->at1) {
+            printf(" ");
+            print_instruction_arg(machine, ins->at1);
+
+            if (ins->at2) {
+                printf(", ");
+                print_instruction_arg(machine, ins->at2);
+            }
+        }
+    }
+    printf("\r");
 }
 
 void reset_machine(vnsem_machine *machine)
@@ -364,6 +407,8 @@ int emulate(void)
             printf("Machine halted.\n");
             console(&machine);
         }
+
+        print_instruction(&machine);
 
         next_ins = machine.mem[machine.pc];
         machine.pc++;

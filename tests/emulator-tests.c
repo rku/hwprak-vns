@@ -45,9 +45,9 @@ inline vnsem_machine _get_machine(vnsem_machine *other)
 }
 
 #define MACHINES_EQUAL(x, y) (memcmp(&x, &y, sizeof(vnsem_machine)) == 0)
-/* #define P(x,y) do { \
+#define P(x,y) do { \
    print_machine_state(&x); \
-   print_machine_state(&y); } while(0); */
+   print_machine_state(&y); } while(0);
 
 /* ------------------------------------------------------------------------
  *                            test instructions
@@ -317,73 +317,149 @@ TEST(test_ins_pop_fl)
 
 TEST(test_ins_inr_a)
 {
+    // A++
     vnsem_machine m1 = _get_machine(NULL);
 
     vnsem_machine m2 = _get_machine(&m1);
     m2.accu++;
 
-    process_instruction(0x3c, &m1);
+    // overflow
+    vnsem_machine m3 = _get_machine(NULL);
+    m3.accu = 0xff;
 
-    ASSERT(MACHINES_EQUAL(m1, m2), "INR A instruction failed!");
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.accu = 0;
+    m4.flags = F_ZERO | F_CARRY;
+
+    process_instruction(0x3c, &m1);
+    process_instruction(0x3c, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "INR A instruction failed!");
 
     return TEST_OK;
 }
 
 TEST(test_ins_inr_l)
 {
+    // A = L++
     vnsem_machine m1 = _get_machine(NULL);
 
     vnsem_machine m2 = _get_machine(&m1);
     m2.reg_l++;
 
-    process_instruction(0x2c, &m1);
+    // overflow should not affect carry register
+    vnsem_machine m3 = _get_machine(NULL);
+    m3.reg_l = 0xff;
 
-    ASSERT(MACHINES_EQUAL(m1, m2), "INR L instruction failed!");
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.reg_l = 0;
+
+    process_instruction(0x2c, &m1);
+    process_instruction(0x2c, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "INR L instruction failed!");
 
     return TEST_OK;
 }
 
 TEST(test_ins_dcr_a)
 {
+    // A--
     vnsem_machine m1 = _get_machine(NULL);
     m1.accu = 23;
 
     vnsem_machine m2 = _get_machine(&m1);
     m2.accu--;
 
-    process_instruction(0x3d, &m1);
+    // underflow
+    vnsem_machine m3 = _get_machine(NULL);
 
-    ASSERT(MACHINES_EQUAL(m1, m2), "DCR A instruction failed!");
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.accu = 0xff;
+    m4.flags = F_CARRY | F_SIGN;
+
+    process_instruction(0x3d, &m1);
+    process_instruction(0x3d, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "DCR A instruction failed!");
 
     return TEST_OK;
 }
 
 TEST(test_ins_dcr_l)
 {
+    // L--
     vnsem_machine m1 = _get_machine(NULL);
     m1.reg_l = 23;
 
     vnsem_machine m2 = _get_machine(&m1);
     m2.reg_l--;
 
-    process_instruction(0x2d, &m1);
+    // underflow should not affect flags
+    vnsem_machine m3 = _get_machine(NULL);
 
-    ASSERT(MACHINES_EQUAL(m1, m2), "DCR L instruction failed!");
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.reg_l = 0xff;
+
+    process_instruction(0x2d, &m1);
+    process_instruction(0x2d, &m3);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4),
+           "DCR L instruction failed!");
 
     return TEST_OK;
 }
 
 TEST(test_ins_add_a)
 {
+    // A=A+A
     vnsem_machine m1 = _get_machine(NULL);
     m1.accu = 21;
 
     vnsem_machine m2 = _get_machine(&m1);
     m2.accu = 42;
 
-    process_instruction(0x87, &m1);
+    // overflow
+    vnsem_machine m3 = _get_machine(NULL);
+    m3.accu = 0x80;
 
-    ASSERT(MACHINES_EQUAL(m1, m2), "ADD A instruction failed!");
+    vnsem_machine m4 = _get_machine(&m3);
+    m4.accu = 0;
+    m4.flags = F_ZERO | F_CARRY;
+
+    // sign
+    vnsem_machine m5 = _get_machine(NULL);
+    m5.accu = 0x20;
+
+    vnsem_machine m6 = _get_machine(&m5);
+    m6.accu = 0x40;
+    m5.flags = F_SIGN;
+
+    // overflow + sign
+    vnsem_machine m7 = _get_machine(NULL);
+    m7.accu = 0xff;
+
+    vnsem_machine m8 = _get_machine(&m7);
+    m8.accu = 0xfe;
+    m8.flags = F_SIGN | F_CARRY;
+
+    process_instruction(0x87, &m1);
+    process_instruction(0x87, &m3);
+    process_instruction(0x87, &m5);
+    process_instruction(0x87, &m7);
+
+    ASSERT(MACHINES_EQUAL(m1, m2) &&
+           MACHINES_EQUAL(m3, m4) &&
+           MACHINES_EQUAL(m5, m6) &&
+           MACHINES_EQUAL(m7, m8),
+           "ADD A instruction failed!");
 
     return TEST_OK;
 }

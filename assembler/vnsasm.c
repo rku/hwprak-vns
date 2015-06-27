@@ -259,8 +259,8 @@ void print_usage(char *pname)
 {
     printf("\nUsage: %s [-hzr] [-o <outfile>] <asmfile>\n\n", pname);
     printf("  -h             Show this help text.\n");
-    printf("  -o <outfile>   Write assembled program to <outfile>.\n");
-    printf("  -z             Do NOT strip trailing zeros.\n");
+    printf("  -o <outfile>   Write assembled program image to <outfile>.\n");
+    printf("  -z             Do NOT pack resulting program image.\n");
     printf("  -r             Print resolved label addresses.\n");
     printf("\n");
 }

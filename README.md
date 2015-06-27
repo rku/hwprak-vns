@@ -172,3 +172,11 @@ supports some additional convenience features and directives:
      .offset 0x50
      .byte 4, 25, 42, 58
      ```
+
+The output file is a plain memory image of the program. It may be loaded
+into the emulator's memory (see above) and should work even on the real
+machine (not tested yet).
+
+If you pass the `-z` option to the assembler, trailing zeros are stripped
+from the resulting memory image. Otherwise the image will cover the whole
+available memory (2^8 bytes). Run the assembler with `-h` for more options.

@@ -92,12 +92,23 @@ static vns_instruction vns_instructionset[] = {
     { "XRI",    AT_INT,     AT_NONE,    0xee },
 };
 
+/* Some handy macros. */
+#define INS_SIZE sizeof(vns_instruction)
+#define INS_COUNT sizeof(vns_instructionset) / sizeof(vns_instruction)
+
+/**
+ * Since we want to have fast opcode lookups too, we maintain an opcode
+ * sorted list of instructions. It will be automatically initialized and
+ * sorted by opcode when accessed for the first time.
+ */
+static vns_instruction vns_is_opcode_sorted[INS_COUNT];
+
 /**
  * Compare two instructions. The comparison is done for the mnemonic,
  * argtype1 and argtype2 in exactly this order. If one of these elements
  * from *key* match its counterpart from *other*, 0 is returned.
  * A negative or positive value is returned otherwise to indicate if
- * *key* is understood to be less or greater than *other*.
+ * *key* is understood to be less or greater than *other*, respectively.
  */
 int inscmp(const void *key, const void *other)
 {
@@ -121,8 +132,20 @@ int inscmp(const void *key, const void *other)
 }
 
 /**
- * Compare a mnemonic (key) with the mnemonic of an
- * instruction (other).
+ * Compare two instructions by opcode. The meaning of the return value
+ * is the same as with inscmp.
+ */
+int opcode_cmp(const void *key, const void *other)
+{
+    vns_instruction *key_ins = (vns_instruction*)key;
+    vns_instruction *other_ins = (vns_instruction*)other;
+
+    return (key_ins->opcode - other_ins->opcode);
+}
+
+/**
+ * Compare a mnemonic (key) with the mnemonic of an instruction (other).
+ * The meaning of the return value is the same as with inscmp.
  */
 int mnemonic_name_cmp(const void *key, const void *other)
 {
@@ -136,11 +159,9 @@ int mnemonic_name_cmp(const void *key, const void *other)
  */
 int is_lookup_mnemonic_name(const char *str)
 {
-    size_t ins_size = sizeof(vns_instruction);
-    int n = sizeof(vns_instructionset) / ins_size;
-
-    if (NULL == bsearch((void*)str, (void*)&vns_instructionset,
-            n, ins_size, mnemonic_name_cmp)) {
+    if (NULL == bsearch(str, &vns_instructionset, INS_COUNT,
+                INS_SIZE, mnemonic_name_cmp))
+    {
         return 0;
     }
 
@@ -155,22 +176,13 @@ int is_lookup_mnemonic_name(const char *str)
 vns_instruction *is_find_mnemonic(const char *mnemonic,
                                   argtype at1, argtype at2)
 {
-    size_t ins_size;
-    unsigned int n;
-    vns_instruction key, *result;
+    vns_instruction key;
 
     key.mnemonic = mnemonic;
     key.at1 = at1;
     key.at2 = at2;
 
-    ins_size = sizeof(vns_instruction);
-    n = sizeof(vns_instructionset) / ins_size;
-
-    result = (vns_instruction*)bsearch(
-            (void*)&key, (void*)&vns_instructionset,
-            n, ins_size, inscmp);
-
-    return result;
+    return bsearch(&key, &vns_instructionset, INS_COUNT, INS_SIZE, inscmp);
 }
 
 /**
@@ -179,24 +191,21 @@ vns_instruction *is_find_mnemonic(const char *mnemonic,
  */
 vns_instruction *is_find_opcode(uint8_t opcode)
 {
-    size_t ins_size;
-    unsigned int n, i;
-    vns_instruction *result;
+    static uint8_t initialized = 0;
+    vns_instruction key;
 
-    /* Since opcode->instruction search is only useful for debugging 
-     * purposes, the instruction set is sorted for find_mnemonic to
-     * be searchable in O(log(n)), so we have to go trough the whole
-     * list in worst cases here. */
-
-    ins_size = sizeof(vns_instruction);
-    n = sizeof(vns_instructionset) / ins_size;
-
-    for (i = 0; i < n; ++i) {
-        result = &vns_instructionset[i];
-        if (result->opcode == opcode) {
-            return result;
-        }
+    if (!initialized) {
+        /**
+         * Initialize the opcode sorted instructionset in order to allow for
+         * binary searching within it.
+         */
+        memcpy(&vns_is_opcode_sorted, &vns_instructionset, INS_SIZE*INS_COUNT);
+        qsort(&vns_is_opcode_sorted, INS_COUNT, INS_SIZE, opcode_cmp);
+        initialized = 1;
     }
 
-    return NULL;
+    key.opcode = opcode;
+
+    return bsearch(&key, &vns_is_opcode_sorted, INS_COUNT,
+            INS_SIZE, opcode_cmp);
 }

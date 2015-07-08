@@ -66,7 +66,7 @@ WHITESPACE          [[:space:]]
                         return TOK_ID;
                     }
 
-\n                  { return TOK_NEWL;       }
+\n+                 { return TOK_NEWL;       }
 {WHITESPACE}+       { /* skip whitespaces */ }
 .                   { return TOK_UNKNOWN;    }
 

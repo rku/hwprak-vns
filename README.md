@@ -23,18 +23,18 @@ should work as well with cygwin.
 
   ```Shell
   vnsasm -o multiply.bin examples/multiply.asm
-  vnsem -s 10 multiply.bin
+  vnsem multiply.bin
   ```
 
 The emulator prints a status line for each executed instruction. It
-represents the machine state *after* the instruction has been executed.
+represents the machine's state *after* the instruction has been executed.
 It looks like this (output taken from the multiply example program):
 
   ```
   #1026  [ ACCU=0xCA  L=0xCA  PC=0x17  SP=0x00 ]  C:*  Z:-  S:*
   ```
 
-The fields have the following meanings (hexadezimal values are
+The fields have the following meaning (hexadecimal values are
 prefixed with '0x'):
 
 * #1026         current step count

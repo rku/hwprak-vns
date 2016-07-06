@@ -48,27 +48,27 @@ void console_step(int argc, char **argv, vnsem_machine *machine);
  * command name.
  */
 static const console_command console_commands[] = {
-    { "break",   console_break,   "Set break point.",
+    { "break",   console_break,   "Set break point",
                  0, 1,            "[<addr>|clear]" },
-    { "help",    console_help,    "Show help for commands.",
+    { "help",    console_help,    "Show help (for command)",
                  0, 1,            "<command>" },
-    { "load",    console_load,    "Load a program.",
+    { "load",    console_load,    "Load program from file",
                  1, 2,            "<programfile> [<offset>]" },
-    { "machine", console_machine, "Show machine information.",
+    { "machine", console_machine, "Print machine state",
                  0, 0,            NULL },
-    { "memdump", console_memdump, "Dump memory.",
+    { "memdump", console_memdump, "Dump memory content",
                  0, 1,            "[<addr>]" },
-    { "memset",  console_memset,  "Set content of a memory cell.",
+    { "memset",  console_memset,  "Set content of a memory cell",
                  2, 2,            "<addr> <value>" },
-    { "pcset",   console_pcset,   "Set the program counter.",
+    { "pcset",   console_pcset,   "Set program counter",
                  1, 1,            "<addr>" },
-    { "quit",    console_quit,    "Quit the emulator.",
+    { "quit",    console_quit,    "Quit emulator",
                  0, 0,            NULL },
-    { "reset",   console_reset,   "Reset (parts of) the machine.",
+    { "reset",   console_reset,   "Reset (parts of the) machine",
                  1, 1,            "pc|mem|all" },
-    { "run",     console_run,     "Start the machine.",
+    { "run",     console_run,     "Start machine",
                  0, 0,            NULL },
-    { "step",    console_step,    "Execute next stepwise.",
+    { "step",    console_step,    "Execute next instruction and stop",
                  0, 0,            NULL }
 };
 

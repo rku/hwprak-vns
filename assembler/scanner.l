@@ -35,6 +35,7 @@ SINGLE              [,:]
 COMMENT             ;.*\n
 TEXT                [A-Z][A-Z0-9_]+
 WHITESPACE          [[:space:]]
+NEWLINE             [\n\r]
 
 %%
 
@@ -66,7 +67,7 @@ WHITESPACE          [[:space:]]
                         return TOK_ID;
                     }
 
-\n+                 { return TOK_NEWL;       }
+{NEWLINE}+          { return TOK_NEWL;       }
 {WHITESPACE}+       { /* skip whitespaces */ }
 .                   { return TOK_UNKNOWN;    }
 
